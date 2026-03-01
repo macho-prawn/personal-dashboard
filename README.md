@@ -109,6 +109,33 @@ flowchart TD
 - Link form update:
   - Description field is optional.
 
+## Development Attribution
+- Principal developer: Codex (GPT-5 coding agent).
+- Collaboration model: iterative prompt-driven development in the local repo with incremental implementation, debugging, and UX refinement.
+
+### Prompt Summary (High-Level)
+- Initial build: create a personal link dashboard using Astro/Alpine + PostgreSQL with Docker Compose.
+- Core CRUD: add categories/links create/edit/delete flows with logging.
+- Reliability fixes: resolve server connectivity/reset issues and environment variable wiring.
+- Feature changes:
+  - Remove random saying functionality.
+  - Add dynamic panels and panel switcher behavior.
+  - Add drag-and-drop ordering with DB persistence for panels/categories/links.
+  - Add cross-category and cross-panel link movement.
+  - Make link description optional.
+  - Add favicon rendering for links with fallback icon.
+- UX updates:
+  - Redesign visual style and refine typography/layout.
+  - Add date/time metadata line in header.
+  - Add keyboard shortcuts (`1`-`9`) for panel switching.
+  - Add inactivity auto-refresh behavior.
+  - Add light/dark theme toggle with persistence and first-visit system fallback.
+  - Tune dark mode colors, contrast, and icon behavior.
+- Documentation updates:
+  - Expand README features and operational details.
+  - Add Mermaid architecture diagram.
+  - Add API-method-to-table entity mapping.
+
 ## Run with Docker
 1. Copy env file:
    ```bash
