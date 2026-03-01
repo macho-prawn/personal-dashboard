@@ -1,5 +1,5 @@
-# Personal Link Dashboard
-Personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized with Docker Compose.
+# Personal Dashboard
+A personal  dashboard built with Astro + Alpine.js + PostgreSQL, containerized with Docker Compose.
 
 ## Table of Contents
 - [Main Features](#main-features)
@@ -116,7 +116,7 @@ npm run dev
 2. Architecture needs to redesigned to 3-tier.
 
 ## Development Attribution
-- Principal developer: Codex (GPT-5 coding agent).
+- Principal developer: Codex (GPT-5 coding agent). // old N00b 👴 assisted a bit
 - Collaboration model: iterative prompt-driven development in the local repo with incremental implementation, debugging, and UX refinement.
 
 ### Prompt Summary (High-Level)
