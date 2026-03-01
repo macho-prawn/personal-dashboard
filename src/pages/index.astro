@@ -1,0 +1,1029 @@
+---
+---
+
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <script is:inline>
+      (() => {
+        try {
+          const saved = localStorage.getItem('dashboard-theme');
+          if (saved === 'light' || saved === 'dark') {
+            document.documentElement.setAttribute('data-theme', saved);
+            return;
+          }
+          const prefersDark =
+            typeof window.matchMedia === 'function' &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+        } catch {}
+      })();
+    </script>
+    <script defer src="https://unpkg.com/alpinejs@3.14.0/dist/cdn.min.js"></script>
+    <style>
+      :root {
+        --bg: #ffd319;
+        --paper: #fffdf5;
+        --ink: #111111;
+        --muted: #585858;
+        --danger: #9a1d1d;
+        --accent: #1a6f4b;
+        --line: #111111;
+      }
+      html[data-theme="dark"] {
+        --bg: #151515;
+        --paper: #212121;
+        --ink: #ffffff;
+        --muted: #bfbfbf;
+        --danger: #ff6b6b;
+        --accent: #4fc98c;
+        --line: #ffd319;
+        color-scheme: dark;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-size: 14px;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 12% 18%, #fff1a6 0 12%, transparent 13%),
+          radial-gradient(circle at 80% 8%, #ffe06d 0 10%, transparent 11%),
+          var(--bg);
+        font-family: "Space Grotesk", "IBM Plex Sans", "Segoe UI", sans-serif;
+      }
+      html[data-theme="dark"] body {
+        background:
+          radial-gradient(circle at 12% 18%, #2f2f2f 0 12%, transparent 13%),
+          radial-gradient(circle at 80% 8%, #262626 0 10%, transparent 11%),
+          var(--bg);
+      }
+
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 1.2rem;
+      }
+
+      .hero {
+        background: var(--paper);
+        border: 3px solid var(--line);
+        box-shadow: 8px 8px 0 var(--line);
+        border-radius: 12px;
+        padding: 1rem 1.2rem;
+        display: grid;
+        gap: .8rem;
+      }
+      .hero-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .6rem;
+      }
+
+      .badge {
+        width: fit-content;
+        border: 2px solid var(--line);
+        background: var(--bg);
+        padding: .22rem .5rem;
+        border-radius: 999px;
+        font-size: .74rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+      }
+      .theme-toggle {
+        background: transparent;
+        color: var(--ink);
+        width: 2rem;
+        height: 2rem;
+        padding: .2rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: clamp(1.7rem, 4vw, 3rem);
+        line-height: 1.1;
+      }
+      .joke-line {
+        margin: 0;
+        font-style: italic;
+        font-weight: 350;
+      }
+      .meta-line {
+        margin: 0;
+        font-weight: 600;
+        display: flex;
+        gap: .45rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .meta-line .sep {
+        color: #777;
+      }
+
+      .muted { color: var(--muted); }
+      .small { font-size: .88rem; }
+      a { color: #004fa1; }
+
+      .layout {
+        margin-top: 1rem;
+        display: grid;
+        grid-template-columns: 340px 1fr;
+        gap: 1rem;
+      }
+
+      .panel {
+        background: var(--paper);
+        border: 3px solid var(--line);
+        border-radius: 12px;
+        box-shadow: 6px 6px 0 var(--line);
+        padding: .9rem;
+      }
+
+      .panel h2 {
+        margin: 0 0 .6rem;
+        font-size: 1.08rem;
+      }
+
+      .stack { display: grid; gap: .6rem; }
+
+      input, select, textarea, button {
+        font: inherit;
+        border-radius: 10px;
+      }
+
+      input, select, textarea {
+        width: 100%;
+        border: 2px solid var(--line);
+        background: #ffffff;
+        padding: .55rem .65rem;
+      }
+      html[data-theme="dark"] input,
+      html[data-theme="dark"] select,
+      html[data-theme="dark"] textarea {
+        background: #121212;
+        color: var(--ink);
+      }
+
+      textarea { min-height: 74px; resize: vertical; }
+
+      button {
+        border: 2px solid var(--line);
+        background: var(--ink);
+        color: #fff;
+        padding: .5rem .7rem;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 3px 3px 0 var(--line);
+      }
+
+      button:hover { transform: translate(-1px, -1px); }
+      button.alt { background: var(--accent); }
+      button.warn { background: var(--danger); }
+      button.ghost { background: #fff; color: var(--ink); }
+      html[data-theme="dark"] button.ghost {
+        background: #2a2a2a;
+        color: var(--ink);
+      }
+
+      .row {
+        display: flex;
+        gap: .55rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .categories {
+        display: grid;
+        gap: .9rem;
+      }
+
+      .category {
+        background: var(--paper);
+        border: 3px solid var(--line);
+        border-radius: 12px;
+        box-shadow: 6px 6px 0 var(--line);
+        padding: .85rem;
+      }
+
+      .cat-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: .6rem;
+      }
+      .drag-group {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+      }
+      .drag-handle {
+        border: 2px solid var(--line);
+        background: #fff6c3;
+        border-radius: 8px;
+        width: 1.8rem;
+        height: 1.8rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: grab;
+        user-select: none;
+        font-weight: 700;
+      }
+      html[data-theme="dark"] .drag-handle {
+        background: #2c2c2c;
+        color: var(--ink);
+      }
+      .drag-handle:active {
+        cursor: grabbing;
+      }
+
+      .cat-title {
+        display: flex;
+        align-items: center;
+        gap: .55rem;
+        font-size: 1.05rem;
+        font-weight: 700;
+      }
+
+      .count-chip {
+        min-width: 1.8rem;
+        height: 1.8rem;
+        padding: 0 .45rem;
+        border: 2px solid var(--line);
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .8rem;
+        font-weight: 700;
+        background: var(--bg);
+      }
+
+      .links { display: grid; gap: .55rem; margin-top: .65rem; }
+
+      .link-item {
+        border: 2px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+        padding: .65rem;
+      }
+      html[data-theme="dark"] .link-item {
+        background: #171717;
+      }
+
+      .link-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: .55rem;
+      }
+      .link-main {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        min-width: 0;
+      }
+      .favicon {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        flex: 0 0 16px;
+        object-fit: contain;
+        background: transparent;
+      }
+
+      .link-name {
+        font-weight: 700;
+        text-decoration: none;
+        color: #00438f;
+      }
+      html[data-theme="dark"] .link-name,
+      html[data-theme="dark"] a {
+        color: #8fc6ff;
+      }
+
+      .empty {
+        border: 2px dashed var(--line);
+        border-radius: 10px;
+        background: #fff9d9;
+        padding: .7rem;
+      }
+      html[data-theme="dark"] .empty {
+        background: #1f1f1f;
+      }
+      .panel-tabs {
+        display: flex;
+        gap: .5rem;
+        flex-wrap: wrap;
+      }
+      .tab-item {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+      }
+      .tab-btn.active {
+        background: var(--accent);
+        color: #fff;
+      }
+      html[data-theme="dark"] .theme-toggle {
+        background: #2a2a2a;
+      }
+      html[data-theme="dark"] button {
+        background: #1a1a1a;
+        color: #ffd319;
+      }
+      html[data-theme="dark"] button.alt,
+      html[data-theme="dark"] button.warn {
+        background: #1a1a1a;
+        color: #ffffff;
+      }
+      html[data-theme="dark"] .panel,
+      html[data-theme="dark"] .category,
+      html[data-theme="dark"] .hero {
+        background: #1f1f1f;
+      }
+      html[data-theme="dark"] .badge,
+      html[data-theme="dark"] .count-chip {
+        background: #303030;
+        color: var(--ink);
+      }
+      html[data-theme="dark"] .tab-btn {
+        background: #2a2a2a;
+        color: var(--ink);
+      }
+      html[data-theme="dark"] .tab-btn.active {
+        background: #1a1a1a;
+        color: #ffffff;
+      }
+      html[data-theme="dark"] .hero,
+      html[data-theme="dark"] .panel,
+      html[data-theme="dark"] .category,
+      html[data-theme="dark"] .link-item,
+      html[data-theme="dark"] button,
+      html[data-theme="dark"] .tab-btn,
+      html[data-theme="dark"] .drag-handle {
+        box-shadow: none;
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap" x-data="dashboardApp()">
+      <section class="hero">
+        <div class="hero-top">
+          <span class="badge">BootCamp / Week1 / Personal Dashboard</span>
+          <button
+            type="button"
+            class="theme-toggle"
+            @click="toggleTheme()"
+            :title="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+            :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+          >
+            <svg
+              x-show="theme === 'light'"
+              viewBox="0 0 24 24"
+              width="14"
+              height="14"
+              fill="currentColor"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M9 18h6"></path>
+              <path d="M10 21h4"></path>
+              <path d="M12 2a7 7 0 0 0-4 12.8V17h8v-2.2A7 7 0 0 0 12 2z"></path>
+            </svg>
+            <svg
+              x-show="theme === 'dark'"
+              viewBox="0 0 24 24"
+              width="14"
+              height="14"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M9 18h6"></path>
+              <path d="M10 21h4"></path>
+              <path d="M12 2a7 7 0 0 0-4 12.8V17h8v-2.2A7 7 0 0 0 12 2z"></path>
+            </svg>
+          </button>
+        </div>
+        <p class="meta-line small">
+          <span x-text="profile.name"></span>
+          <span class="sep">|</span>
+          <span x-text="profile.title"></span>
+          <span class="sep">|</span>
+          <a :href="`mailto:${profile.email}`" x-text="profile.email"></a>
+          <span class="sep">|</span>
+          <span x-text="timeDisplay"></span>
+          <span class="sep">|</span>
+          <span x-text="todayDisplay"></span>
+        </p>
+        <p class="joke-line muted" x-text="jokeText"></p>
+        <div class="panel-tabs">
+          <template x-for="panel in panels" :key="panel.id">
+            <div class="tab-item" @dragover.prevent @drop.prevent.stop="onPanelDrop(panel.id, $event)">
+              <span
+                class="drag-handle"
+                title="Drag panel"
+                draggable="true"
+                @dragstart="onPanelDragStart(panel.id, $event)"
+                @dragend="onDragEnd()"
+              >::</span>
+              <button
+                type="button"
+                class="tab-btn"
+                :class="{ active: panel.id === activePanelId }"
+                @click="switchPanel(panel.id)"
+                @dragover.prevent
+                @drop.prevent.stop="onPanelTabDrop(panel.id, $event)"
+                x-text="panel.name"
+              ></button>
+            </div>
+          </template>
+        </div>
+      </section>
+
+      <section class="layout">
+        <aside class="stack">
+          <article class="panel">
+            <h2>Create Category</h2>
+            <p class="small" x-show="errorMessage" x-text="errorMessage" style="color:#9a1d1d;"></p>
+            <form class="row" @submit.prevent="addCategory()">
+              <input x-model="newCategory" placeholder="Category name" required />
+              <button class="alt" type="submit">Create</button>
+            </form>
+          </article>
+
+          <article class="panel">
+            <h2>Add / Edit Link</h2>
+            <form @submit.prevent="submitLink()" class="stack">
+              <input x-model="form.name" placeholder="Link name" required />
+              <input x-model="form.url" type="url" placeholder="https://example.com" required />
+              <select x-model.number="form.categoryId" required>
+                <option value="">Select category</option>
+                <template x-for="category in filteredCategories()" :key="category.id">
+                  <option :value="category.id" x-text="category.name"></option>
+                </template>
+              </select>
+              <textarea x-model="form.description" placeholder="Description (optional)"></textarea>
+              <div class="row">
+                <button class="alt" type="submit" x-text="editingId ? 'Save Changes' : 'Add Link'"></button>
+                <button class="ghost" type="button" x-show="editingId" @click="resetForm()">Cancel</button>
+              </div>
+            </form>
+          </article>
+        </aside>
+
+        <section class="categories">
+          <template x-for="category in filteredCategories()" :key="category.id">
+            <article class="category">
+              <div class="cat-head" @dragover.prevent @drop.prevent.stop="onCategoryDrop(category.id)">
+                <div class="drag-group">
+                  <span
+                    class="drag-handle"
+                    title="Drag category"
+                    draggable="true"
+                    @dragstart="onCategoryDragStart(category.id, $event)"
+                    @dragend="onDragEnd()"
+                  >::</span>
+                  <h3 class="cat-title">
+                    <span x-text="category.name"></span>
+                    <span class="count-chip" x-text="category.links.length"></span>
+                  </h3>
+                </div>
+                <button class="warn small" @click="deleteCategory(category.id)">Delete Category</button>
+              </div>
+
+              <template x-if="category.links.length === 0">
+                <p class="empty small muted">No links yet.</p>
+              </template>
+
+              <div
+                class="links"
+                x-show="category.links.length > 0"
+                @dragover.prevent
+                @drop.prevent.stop="onLinkDropToCategoryEnd(category.id)"
+              >
+                <template x-for="link in category.links" :key="link.id">
+                  <div
+                    class="link-item"
+                    @dragover.prevent
+                    @drop.prevent.stop="onLinkDrop(category.id, link.id, $event)"
+                  >
+                    <div class="link-top">
+                      <div class="link-main">
+                        <span
+                          class="drag-handle"
+                          title="Drag link"
+                          draggable="true"
+                          @dragstart="onLinkDragStart(link.id, category.id, $event)"
+                          @dragend="onDragEnd()"
+                        >::</span>
+                        <img
+                          class="favicon"
+                          :src="getFaviconUrl(link.url)"
+                          @error="onFaviconError($event)"
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        <a class="link-name" :href="link.url" target="_blank" rel="noreferrer" x-text="link.name"></a>
+                      </div>
+                      <div class="row">
+                        <button class="ghost small" @click="startEdit(link)">Edit</button>
+                        <button class="warn small" @click="deleteLink(link.id)">Delete</button>
+                      </div>
+                    </div>
+                    <p class="small muted" x-text="link.description"></p>
+                  </div>
+                </template>
+              </div>
+            </article>
+          </template>
+        </section>
+      </section>
+    </main>
+
+    <script is:inline>
+      window.dashboardApp = function () {
+        const log = (event, meta = {}) => {
+          console.info(`[dashboard] ${event}`, meta);
+        };
+
+        return {
+          inactivityMs: 30 * 1000,
+          inactivityTimer: null,
+          theme: 'light',
+          profile: { name: 'Loading...', title: '', email: '' },
+          panels: [],
+          activePanelId: null,
+          categories: [],
+          dragPanelId: null,
+          dragCategoryId: null,
+          dragLinkId: null,
+          dragFromCategoryId: null,
+          errorMessage: '',
+          newCategory: '',
+          timeDisplay: '',
+          todayDisplay: '',
+          jokeText: 'Loading a joke...',
+          jokeLoaded: false,
+          editingId: null,
+          form: {
+            name: '',
+            url: '',
+            description: '',
+            categoryId: ''
+          },
+
+          async init() {
+            this.theme = document.documentElement.getAttribute('data-theme') || 'light';
+            this.setupInactivityWatcher();
+            this.setupPanelHotkeys();
+            this.timeDisplay = new Date().toLocaleTimeString(undefined, {
+              hour: 'numeric',
+              minute: '2-digit',
+              timeZoneName: 'short'
+            });
+            this.todayDisplay = new Date().toLocaleDateString(undefined, {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric'
+            });
+            await this.loadJoke();
+            await this.load();
+          },
+
+          toggleTheme() {
+            this.theme = this.theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', this.theme);
+            try {
+              localStorage.setItem('dashboard-theme', this.theme);
+            } catch {}
+          },
+
+          setupInactivityWatcher() {
+            const resetTimer = () => {
+              if (this.inactivityTimer) clearTimeout(this.inactivityTimer);
+              this.inactivityTimer = setTimeout(() => {
+                window.location.reload();
+              }, this.inactivityMs);
+            };
+
+            ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'pointerdown']
+              .forEach((eventName) => {
+                window.addEventListener(eventName, resetTimer, { passive: true });
+              });
+
+            resetTimer();
+          },
+
+          setupPanelHotkeys() {
+            window.addEventListener('keydown', (event) => {
+              const active = document.activeElement;
+              const tag = (active?.tagName || '').toLowerCase();
+              const isTypingContext =
+                tag === 'input' ||
+                tag === 'textarea' ||
+                tag === 'select' ||
+                active?.isContentEditable;
+
+              if (isTypingContext) return;
+              if (event.metaKey || event.ctrlKey || event.altKey) return;
+
+              const keyNum = Number(event.key);
+              if (!Number.isInteger(keyNum) || keyNum < 1 || keyNum > 9) return;
+
+              const targetPanel = this.panels[keyNum - 1];
+              if (!targetPanel) return;
+
+              event.preventDefault();
+              this.switchPanel(targetPanel.id);
+            });
+          },
+
+          async loadJoke() {
+            if (this.jokeLoaded) return;
+            try {
+              const response = await fetch('https://api.chucknorris.io/jokes/random');
+              if (!response.ok) {
+                throw new Error(`Joke request failed with ${response.status}`);
+              }
+              const data = await response.json();
+              this.jokeText = data?.value || 'No joke available right now.';
+              this.jokeLoaded = true;
+            } catch {
+              this.jokeText = 'No joke available right now.';
+              this.jokeLoaded = true;
+            }
+          },
+
+          async load() {
+            log('load:start');
+            const response = await fetch('/api/dashboard.json');
+            if (!response.ok) {
+              this.errorMessage = 'Failed to load dashboard data';
+              return;
+            }
+            const data = await response.json();
+            this.profile = data.profile;
+            this.panels = data.panels || [];
+            this.categories = data.categories;
+            if (
+              this.activePanelId &&
+              !this.panels.some((panel) => panel.id === this.activePanelId)
+            ) {
+              this.activePanelId = null;
+            }
+            if (!this.activePanelId && this.panels.length > 0) {
+              this.activePanelId = this.panels[0].id;
+            }
+            if (
+              this.form.categoryId &&
+              !this.filteredCategories().some((category) => category.id === this.form.categoryId)
+            ) {
+              this.form.categoryId = '';
+            }
+            this.errorMessage = '';
+            log('load:done', { categories: this.categories.length });
+          },
+
+          filteredCategories() {
+            if (!this.activePanelId) return [];
+            return this.categories.filter((category) => category.panel_id === this.activePanelId);
+          },
+
+          getCategoryById(categoryId) {
+            return this.categories.find((category) => category.id === categoryId);
+          },
+
+          firstCategoryInPanel(panelId) {
+            const candidates = this.categories
+              .filter((category) => category.panel_id === panelId)
+              .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+            return candidates[0] || null;
+          },
+
+          switchPanel(panelId) {
+            this.activePanelId = panelId;
+            if (
+              this.form.categoryId &&
+              !this.filteredCategories().some((category) => category.id === this.form.categoryId)
+            ) {
+              this.form.categoryId = '';
+            }
+          },
+
+          getFaviconUrl(linkUrl) {
+            try {
+              const parsed = new URL(linkUrl);
+              return `https://www.google.com/s2/favicons?sz=64&domain=${encodeURIComponent(parsed.hostname)}`;
+            } catch {
+              return this.getFallbackFavicon();
+            }
+          },
+
+          getFallbackFavicon() {
+            const svg = `
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+                <rect width="64" height="64" rx="12" fill="#2d2d2d"/>
+                <circle cx="22" cy="24" r="6" fill="#ffd319"/>
+                <rect x="20" y="34" width="24" height="6" rx="3" fill="#ffd319"/>
+              </svg>
+            `.trim();
+            return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+          },
+
+          onFaviconError(event) {
+            const fallback = this.getFallbackFavicon();
+            if (event?.target && event.target.src !== fallback) {
+              event.target.src = fallback;
+            }
+          },
+
+          onPanelDragStart(panelId, event) {
+            this.dragPanelId = panelId;
+            if (event?.dataTransfer) {
+              event.dataTransfer.effectAllowed = 'move';
+            }
+          },
+
+          async onPanelDrop(targetPanelId, event) {
+            if (!this.dragPanelId || this.dragPanelId === targetPanelId) return;
+            const orderedPanels = [...this.panels];
+            const sourceIndex = orderedPanels.findIndex((panel) => panel.id === this.dragPanelId);
+            const targetIndex = orderedPanels.findIndex((panel) => panel.id === targetPanelId);
+            if (sourceIndex < 0 || targetIndex < 0) return;
+
+            let insertAfter = false;
+            if (event?.currentTarget) {
+              const rect = event.currentTarget.getBoundingClientRect();
+              const midpoint = rect.left + rect.width / 2;
+              insertAfter = event.clientX > midpoint;
+            }
+
+            let destinationIndex = targetIndex + (insertAfter ? 1 : 0);
+            if (sourceIndex < destinationIndex) {
+              destinationIndex -= 1;
+            }
+
+            const [movedPanel] = orderedPanels.splice(sourceIndex, 1);
+            orderedPanels.splice(destinationIndex, 0, movedPanel);
+            this.panels = orderedPanels;
+
+            await fetch('/api/panels/reorder', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                orderedPanelIds: orderedPanels.map((panel) => panel.id)
+              })
+            });
+            this.onDragEnd();
+          },
+
+          onCategoryDragStart(categoryId, event) {
+            this.dragCategoryId = categoryId;
+            if (event?.dataTransfer) {
+              event.dataTransfer.effectAllowed = 'move';
+            }
+          },
+
+          async onCategoryDrop(targetCategoryId) {
+            if (!this.dragCategoryId || this.dragCategoryId === targetCategoryId) return;
+
+            const visible = this.filteredCategories();
+            const sourceIndex = visible.findIndex((category) => category.id === this.dragCategoryId);
+            const targetIndex = visible.findIndex((category) => category.id === targetCategoryId);
+            if (sourceIndex < 0 || targetIndex < 0) return;
+
+            const [moved] = visible.splice(sourceIndex, 1);
+            visible.splice(targetIndex, 0, moved);
+
+            for (let i = 0; i < visible.length; i += 1) {
+              visible[i].sort_order = i + 1;
+            }
+
+            const visibleIds = new Set(visible.map((category) => category.id));
+            this.categories = [
+              ...this.categories.filter((category) => !visibleIds.has(category.id)),
+              ...visible
+            ];
+
+            await fetch('/api/categories/reorder', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                panelId: this.activePanelId,
+                orderedCategoryIds: visible.map((category) => category.id)
+              })
+            });
+          },
+
+          onLinkDragStart(linkId, categoryId, event) {
+            this.dragLinkId = linkId;
+            this.dragFromCategoryId = categoryId;
+            if (event?.dataTransfer) {
+              event.dataTransfer.effectAllowed = 'move';
+            }
+          },
+
+          async onLinkDrop(targetCategoryId, targetLinkId, event) {
+            await this.moveDraggedLink(targetCategoryId, targetLinkId, event);
+          },
+
+          async onLinkDropToCategoryEnd(targetCategoryId) {
+            await this.moveDraggedLink(targetCategoryId, null);
+          },
+
+          async onPanelTabDrop(panelId, event) {
+            if (this.dragPanelId) {
+              await this.onPanelDrop(panelId, event);
+              return;
+            }
+
+            if (!this.dragLinkId || !this.dragFromCategoryId) return;
+            const targetCategory = this.firstCategoryInPanel(panelId);
+            if (!targetCategory) {
+              this.errorMessage = 'Create a category in this panel before dropping links.';
+              this.onDragEnd();
+              return;
+            }
+            this.activePanelId = panelId;
+            await this.moveDraggedLink(targetCategory.id, null);
+          },
+
+          async moveDraggedLink(targetCategoryId, targetLinkId = null, event = null) {
+            if (!this.dragLinkId || !this.dragFromCategoryId) return;
+
+            const sourceCategory = this.getCategoryById(this.dragFromCategoryId);
+            const targetCategory = this.getCategoryById(targetCategoryId);
+            if (!sourceCategory || !targetCategory) return;
+
+            const sourceLinks = sourceCategory.links || [];
+            const sourceIndex = sourceLinks.findIndex((link) => link.id === this.dragLinkId);
+            if (sourceIndex < 0) return;
+
+            const [movedLink] = sourceLinks.splice(sourceIndex, 1);
+            movedLink.category_id = targetCategoryId;
+
+            const targetLinks = targetCategory.links || [];
+            if (targetLinkId == null) {
+              targetLinks.push(movedLink);
+            } else {
+              const targetIndex = targetLinks.findIndex((link) => link.id === targetLinkId);
+              if (targetIndex < 0) {
+                targetLinks.push(movedLink);
+              } else {
+                let insertIndex = targetIndex;
+                if (event?.currentTarget) {
+                  const rect = event.currentTarget.getBoundingClientRect();
+                  const offsetY = event.clientY - rect.top;
+                  if (offsetY > rect.height / 2) {
+                    insertIndex = targetIndex + 1;
+                  }
+                }
+                targetLinks.splice(insertIndex, 0, movedLink);
+              }
+            }
+
+            await this.persistLinkOrder();
+          },
+
+          async persistLinkOrder() {
+            const payload = [];
+            for (const category of this.categories) {
+              for (let i = 0; i < (category.links || []).length; i += 1) {
+                const link = category.links[i];
+                link.sort_order = i + 1;
+                payload.push({
+                  id: link.id,
+                  categoryId: category.id,
+                  sortOrder: i + 1
+                });
+              }
+            }
+
+            if (payload.length > 0) {
+              await fetch('/api/links/reorder', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ items: payload })
+              });
+            }
+            this.onDragEnd();
+          },
+
+          onDragEnd() {
+            this.dragPanelId = null;
+            this.dragCategoryId = null;
+            this.dragLinkId = null;
+            this.dragFromCategoryId = null;
+          },
+
+          async addCategory() {
+            if (!this.newCategory.trim()) return;
+            log('category:create', { name: this.newCategory });
+            const response = await fetch('/api/categories', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name: this.newCategory })
+            });
+            if (!response.ok) {
+              const payload = await response.json().catch(() => ({}));
+              this.errorMessage = payload.error || 'Failed to create category';
+              return;
+            }
+            const created = await response.json().catch(() => ({}));
+            this.newCategory = '';
+            this.errorMessage = '';
+            await this.load();
+            if (created?.panel_id) {
+              this.activePanelId = created.panel_id;
+            }
+          },
+
+          startEdit(link) {
+            log('link:edit:start', { id: link.id });
+            const category = this.categories.find((item) => item.id === link.category_id);
+            if (category?.panel_id) {
+              this.activePanelId = category.panel_id;
+            }
+            this.editingId = link.id;
+            this.form = {
+              name: link.name,
+              url: link.url,
+              description: link.description,
+              categoryId: link.category_id
+            };
+          },
+
+          resetForm() {
+            log('link:edit:reset');
+            this.editingId = null;
+            this.form = { name: '', url: '', description: '', categoryId: '' };
+          },
+
+          async submitLink() {
+            const payload = {
+              ...this.form,
+              categoryId: Number(this.form.categoryId)
+            };
+
+            if (this.editingId) {
+              log('link:update', { id: this.editingId });
+              await fetch(`/api/links/${this.editingId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+            } else {
+              log('link:create', { categoryId: payload.categoryId });
+              await fetch('/api/links', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+            }
+
+            this.resetForm();
+            await this.load();
+          },
+
+          async deleteLink(id) {
+            log('link:delete', { id });
+            await fetch(`/api/links/${id}`, { method: 'DELETE' });
+            await this.load();
+          },
+
+          async deleteCategory(id) {
+            log('category:delete', { id });
+            await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+            if (this.form.categoryId === id) this.resetForm();
+            await this.load();
+          }
+        };
+      };
+    </script>
+  </body>
+</html>
