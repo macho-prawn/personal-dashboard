@@ -23,7 +23,7 @@ A personal  dashboard built with Astro + Alpine.js + PostgreSQL, containerized w
   - Links reorder before/after inside category.
   - Links move across categories and across panels (drop on panel tab).
 - Profile header metadata:
-  - `Name | Title | Email | Time TZ | Day, Month Date, Year`
+  - `Name | Title | Email | Time TZ | Day, Month Date, Year | Category Count | Link Count`
 - Random Chuck Norris joke displayed below header.
 - Optional link description field.
 - Inactivity auto-refresh timer.
