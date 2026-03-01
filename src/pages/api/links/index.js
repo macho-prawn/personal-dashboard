@@ -17,6 +17,20 @@ export const POST = async ({ request }) => {
       });
     }
 
+    const duplicate = await query(
+      `SELECT id
+       FROM links
+       WHERE category_id = $1 AND LOWER(name) = LOWER($2)
+       LIMIT 1`,
+      [categoryId, name]
+    );
+    if (duplicate.rowCount) {
+      return new Response(JSON.stringify({ error: 'Duplicate link name in this category' }), {
+        status: 409,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const result = await query(
       `WITH next_order AS (
          SELECT COALESCE(MAX(sort_order), 0) + 1 AS value

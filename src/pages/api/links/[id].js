@@ -24,6 +24,22 @@ export const PUT = async ({ params, request }) => {
       });
     }
 
+    const duplicate = await query(
+      `SELECT id
+       FROM links
+       WHERE category_id = $1
+         AND LOWER(name) = LOWER($2)
+         AND id <> $3
+       LIMIT 1`,
+      [categoryId, name, id]
+    );
+    if (duplicate.rowCount) {
+      return new Response(JSON.stringify({ error: 'Duplicate link name in this category' }), {
+        status: 409,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const result = await query(
       `UPDATE links
        SET name = $1, url = $2, description = $3, category_id = $4, updated_at = NOW()

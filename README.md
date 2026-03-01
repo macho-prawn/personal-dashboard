@@ -1,6 +1,18 @@
 # Personal Link Dashboard
 Personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized with Docker Compose.
 
+## Table of Contents
+- [Main Features](#main-features)
+- [Tech Stack](#tech-stack)
+- [Data Model (Current)](#data-model-current)
+- [Architecture Diagram](#architecture-diagram)
+- [Incremental Updates](#incremental-updates)
+- [Run with Docker](#run-with-docker)
+- [Local Development](#local-development)
+- [TODO](#todo)
+- [Development Attribution](#development-attribution)
+- [Environment Variables](#environment-variables)
+
 ## Main Features
 - Dynamic panels (tabs): panel lifecycle is tied to category lifecycle.
 - Category creates a panel automatically; deleting that category removes the empty panel.
@@ -36,56 +48,15 @@ Personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized with
 
 ## Architecture Diagram
 ```mermaid
-flowchart TD
-  U[Browser UI\nAstro + Alpine] --> API[Astro API Layer]
+flowchart LR
+  U[Browser UI\nAstro + Alpine] --> API[Astro Server/API]
   API --> DB[(PostgreSQL)]
-  API --> J[api.chucknorris.io]
-  U --> F[google.com/s2/favicons]
+  API --> J[Chuck Norris Joke API]
+  U --> F[Favicon Service]
 
-  subgraph Endpoints[API Endpoints + Methods]
-    E1["GET /api/dashboard.json"]
-    E2["POST /api/categories"]
-    E3["DELETE /api/categories/:id"]
-    E4["POST /api/categories/reorder"]
-    E5["POST /api/links"]
-    E6["PUT /api/links/:id"]
-    E7["DELETE /api/links/:id"]
-    E8["POST /api/links/reorder"]
-    E9["POST /api/panels/reorder"]
-  end
-
-  API --- E1
-  API --- E2
-  API --- E3
-  API --- E4
-  API --- E5
-  API --- E6
-  API --- E7
-  API --- E8
-  API --- E9
-
-  subgraph Tables[Database Tables]
-    T1[(panels)]
-    T2[(categories)]
-    T3[(links)]
-  end
-
-  E1 -->|SELECT| T1
-  E1 -->|SELECT| T2
-  E1 -->|SELECT| T3
-
-  E2 -->|INSERT| T1
-  E2 -->|INSERT| T2
-  E3 -->|DELETE| T2
-  E3 -->|DELETE if empty| T1
-  E4 -->|UPDATE sort_order| T2
-
-  E5 -->|INSERT| T3
-  E6 -->|UPDATE| T3
-  E7 -->|DELETE| T3
-  E8 -->|UPDATE category_id, sort_order| T3
-
-  E9 -->|UPDATE sort_order| T1
+  DB --- P[(panels)]
+  DB --- C[(categories)]
+  DB --- L[(links)]
 ```
 
 ## Incremental Updates
@@ -108,6 +79,15 @@ flowchart TD
   - Fallback icon graphic shown when favicon is unavailable.
 - Link form update:
   - Description field is optional.
+- Search and validation updates:
+  - Link search bar now searches links across all categories.
+  - Duplicate link names are blocked within the same category.
+- Drag-and-drop updates:
+  - Panel drag/drop handling fixed for both right-to-left and left-to-right reordering.
+- Theme updates (latest):
+  - Dark theme button text and active panel text adjusted for readability.
+  - Dark theme shadow effects removed from bordered boxes.
+  - Theme toggle icon changed to bulb (filled in light mode, outlined in dark mode).
 
 ## Run with Docker
 1. Copy env file:
@@ -164,4 +144,3 @@ npm run dev
 
 ## Environment Variables
 See `.env.example` for all available variables.
-

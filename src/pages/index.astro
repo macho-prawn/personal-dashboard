@@ -322,8 +322,21 @@
       }
       .panel-tabs {
         display: flex;
+        gap: .75rem;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .panel-tabs-left {
+        display: flex;
         gap: .5rem;
         flex-wrap: wrap;
+        align-items: center;
+      }
+      .panel-tabs-right {
+        margin-left: auto;
+        min-width: 220px;
+        max-width: 320px;
       }
       .tab-item {
         display: inline-flex;
@@ -437,29 +450,36 @@
           <span x-text="timeDisplay"></span>
           <span class="sep">|</span>
           <span x-text="todayDisplay"></span>
+          <span class="sep">|</span>
+          <span x-text="`Categories: ${totalCategories()} | Links: ${totalLinks()}`"></span>
         </p>
         <p class="joke-line muted" x-text="jokeText"></p>
         <div class="panel-tabs">
-          <template x-for="panel in panels" :key="panel.id">
-            <div class="tab-item" @dragover.prevent @drop.prevent.stop="onPanelDrop(panel.id, $event)">
-              <span
-                class="drag-handle"
-                title="Drag panel"
-                draggable="true"
-                @dragstart="onPanelDragStart(panel.id, $event)"
-                @dragend="onDragEnd()"
-              >::</span>
-              <button
-                type="button"
-                class="tab-btn"
-                :class="{ active: panel.id === activePanelId }"
-                @click="switchPanel(panel.id)"
-                @dragover.prevent
-                @drop.prevent.stop="onPanelTabDrop(panel.id, $event)"
-                x-text="panel.name"
-              ></button>
-            </div>
-          </template>
+          <div class="panel-tabs-left">
+            <template x-for="panel in panels" :key="panel.id">
+              <div class="tab-item" @dragover.prevent @drop.prevent.stop="onPanelDrop(panel.id, $event)">
+                <span
+                  class="drag-handle"
+                  title="Drag panel"
+                  draggable="true"
+                  @dragstart="onPanelDragStart(panel.id, $event)"
+                  @dragend="onDragEnd()"
+                >::</span>
+                <button
+                  type="button"
+                  class="tab-btn"
+                  :class="{ active: panel.id === activePanelId }"
+                  @click="switchPanel(panel.id)"
+                  @dragover.prevent
+                  @drop.prevent.stop="onPanelTabDrop(panel.id, $event)"
+                  x-text="panel.name"
+                ></button>
+              </div>
+            </template>
+          </div>
+          <div class="panel-tabs-right">
+            <input x-model="linkSearch" placeholder="Search link names..." />
+          </div>
         </div>
       </section>
 
@@ -495,7 +515,7 @@
         </aside>
 
         <section class="categories">
-          <template x-for="category in filteredCategories()" :key="category.id">
+          <template x-for="category in displayCategories()" :key="category.id">
             <article class="category">
               <div class="cat-head" @dragover.prevent @drop.prevent.stop="onCategoryDrop(category.id)">
                 <div class="drag-group">
@@ -514,19 +534,20 @@
                 <button class="warn small" @click="deleteCategory(category.id)">Delete Category</button>
               </div>
 
-              <template x-if="category.links.length === 0">
-                <p class="empty small muted">No links yet.</p>
+              <template x-if="!categoryHasVisibleLinks(category)">
+                <p class="empty small muted" x-text="linkSearch ? 'No matching links.' : 'No links yet.'"></p>
               </template>
 
               <div
                 class="links"
-                x-show="category.links.length > 0"
+                x-show="categoryHasVisibleLinks(category)"
                 @dragover.prevent
                 @drop.prevent.stop="onLinkDropToCategoryEnd(category.id)"
               >
                 <template x-for="link in category.links" :key="link.id">
                   <div
                     class="link-item"
+                    x-show="matchesLinkSearch(link.name)"
                     @dragover.prevent
                     @drop.prevent.stop="onLinkDrop(category.id, link.id, $event)"
                   >
@@ -578,6 +599,7 @@
           panels: [],
           activePanelId: null,
           categories: [],
+          linkSearch: '',
           dragPanelId: null,
           dragCategoryId: null,
           dragLinkId: null,
@@ -712,6 +734,35 @@
           filteredCategories() {
             if (!this.activePanelId) return [];
             return this.categories.filter((category) => category.panel_id === this.activePanelId);
+          },
+
+          displayCategories() {
+            const q = this.linkSearch.trim();
+            if (!q) return this.filteredCategories();
+            return this.categories.filter((category) => this.categoryHasVisibleLinks(category));
+          },
+
+          matchesLinkSearch(linkName) {
+            const q = this.linkSearch.trim().toLowerCase();
+            if (!q) return true;
+            return String(linkName || '').toLowerCase().includes(q);
+          },
+
+          categoryHasVisibleLinks(category) {
+            const links = category?.links || [];
+            if (links.length === 0) return false;
+            return links.some((link) => this.matchesLinkSearch(link.name));
+          },
+
+          totalCategories() {
+            return this.categories.length;
+          },
+
+          totalLinks() {
+            return this.categories.reduce(
+              (sum, category) => sum + ((category.links || []).length),
+              0
+            );
           },
 
           getCategoryById(categoryId) {
@@ -990,23 +1041,31 @@
               categoryId: Number(this.form.categoryId)
             };
 
+            let response;
             if (this.editingId) {
               log('link:update', { id: this.editingId });
-              await fetch(`/api/links/${this.editingId}`, {
+              response = await fetch(`/api/links/${this.editingId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
               });
             } else {
               log('link:create', { categoryId: payload.categoryId });
-              await fetch('/api/links', {
+              response = await fetch('/api/links', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
               });
             }
 
+            if (!response.ok) {
+              const payloadError = await response.json().catch(() => ({}));
+              this.errorMessage = payloadError.error || 'Failed to save link';
+              return;
+            }
+
             this.resetForm();
+            this.errorMessage = '';
             await this.load();
           },
 
