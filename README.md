@@ -109,6 +109,32 @@ flowchart TD
 - Link form update:
   - Description field is optional.
 
+## Run with Docker
+1. Copy env file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Start:
+   ```bash
+   docker compose up --build --detached
+   ```
+2. Stop:
+   ```bash
+   docker compose down
+   ```
+3. Open:
+   `http://<your_url>:8080`
+
+## Local Development
+```bash
+npm install
+npm run dev
+```
+
+## TODO
+1. Integrate TLS/SSL.
+2. Architecture needs to redesigned to 3-tier.
+
 ## Development Attribution
 - Principal developer: Codex (GPT-5 coding agent).
 - Collaboration model: iterative prompt-driven development in the local repo with incremental implementation, debugging, and UX refinement.
@@ -136,31 +162,6 @@ flowchart TD
   - Add Mermaid architecture diagram.
   - Add API-method-to-table entity mapping.
 
-## Run with Docker
-1. Copy env file:
-   ```bash
-   cp .env.example .env
-   ```
-2. Start:
-   ```bash
-   docker compose up --build --detached
-   ```
-2. Stop:
-   ```bash
-   docker compose down
-   ```
-3. Open:
-   `http://<your_url>:8080`
-
-## Local Development
-```bash
-npm install
-npm run dev
-```
-
-## TODO
-1. Integrate TLS/SSL.
-2. Architecture needs to redesigned to 3-tier.
-
 ## Environment Variables
 See `.env.example` for all available variables.
+
