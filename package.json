@@ -1,0 +1,16 @@
+{
+  "name": "personal-dashboard",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev --host 0.0.0.0",
+    "build": "astro build",
+    "start": "node ./dist/server/entry.mjs"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.3.0",
+    "astro": "^5.4.0",
+    "pg": "^8.13.3"
+  }
+}
