@@ -1,5 +1,5 @@
 # Personal Dashboard
-A personal  dashboard built with Astro + Alpine.js + PostgreSQL, containerized with Docker Compose.
+A personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized with Docker Compose.
 
 ## Table of Contents
 - [Main Features](#main-features)
