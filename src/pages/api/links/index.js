@@ -20,12 +20,12 @@ export const POST = async ({ request }) => {
     const duplicate = await query(
       `SELECT id
        FROM links
-       WHERE category_id = $1 AND LOWER(name) = LOWER($2)
+       WHERE LOWER(name) = LOWER($1)
        LIMIT 1`,
-      [categoryId, name]
+      [name]
     );
     if (duplicate.rowCount) {
-      return new Response(JSON.stringify({ error: 'Duplicate link name in this category' }), {
+      return new Response(JSON.stringify({ error: 'Duplicate link name already exists' }), {
         status: 409,
         headers: { 'Content-Type': 'application/json' }
       });

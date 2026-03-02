@@ -11,6 +11,20 @@ export const DELETE = async ({ params }) => {
       });
     }
 
+    const linksResult = await query(
+      'SELECT 1 FROM links WHERE category_id = $1 LIMIT 1',
+      [id]
+    );
+    if (linksResult.rowCount > 0) {
+      return new Response(
+        JSON.stringify({ error: 'Delete all links in this category before deleting it' }),
+        {
+          status: 409,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
     const result = await query(
       'DELETE FROM categories WHERE id = $1 RETURNING id, panel_id',
       [id]

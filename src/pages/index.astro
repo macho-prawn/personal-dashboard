@@ -32,6 +32,8 @@
         --danger: #9a1d1d;
         --accent: #1a6f4b;
         --line: #111111;
+        --side-card-height: 154px;
+        --overall-side-height: calc((var(--side-card-height) * 4) + (0.45rem * 3) + 1rem);
       }
       html[data-theme="dark"] {
         --bg: #151515;
@@ -45,6 +47,7 @@
       }
 
       * { box-sizing: border-box; }
+      [x-cloak] { display: none !important; }
 
       body {
         margin: 0;
@@ -67,6 +70,7 @@
         max-width: 1120px;
         margin: 0 auto;
         padding: 1.2rem;
+        zoom: 0.75;
       }
 
       .hero {
@@ -128,6 +132,11 @@
       .meta-line .sep {
         color: #777;
       }
+      .hero-actions {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+      }
 
       .muted { color: var(--muted); }
       .small { font-size: .88rem; }
@@ -136,8 +145,72 @@
       .layout {
         margin-top: 1rem;
         display: grid;
-        grid-template-columns: 340px 1fr;
+        grid-template-columns: max-content minmax(0, 1fr) max-content;
         gap: 1rem;
+        align-items: start;
+      }
+      .news-pane {
+        width: 100%;
+        min-height: var(--overall-side-height);
+        max-height: var(--overall-side-height);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        border: 2px solid var(--line);
+        border-radius: 12px;
+        padding: .6rem;
+        box-shadow: none;
+        background: #ffffff;
+      }
+      html[data-theme="dark"] .news-pane {
+        background: transparent;
+      }
+      .news-scroll {
+        overflow-y: auto;
+        padding-right: .25rem;
+      }
+      .news-list {
+        display: grid;
+        gap: .55rem;
+      }
+      .news-item {
+        border: 2px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+        padding: .5rem;
+        display: grid;
+        gap: .35rem;
+        min-height: var(--side-card-height);
+        max-height: var(--side-card-height);
+        width: 100%;
+        overflow: hidden;
+      }
+      html[data-theme="dark"] .news-item {
+        background: #171717;
+      }
+      .news-thumb {
+        width: 100%;
+        height: 56px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        display: block;
+        object-fit: cover;
+      }
+      .news-link {
+        color: #00438f;
+        text-decoration: none;
+        font-weight: 700;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      html[data-theme="dark"] .news-link {
+        color: #8fc6ff;
+      }
+      .news-meta {
+        font-size: .75rem;
+        color: var(--muted);
       }
 
       .panel {
@@ -188,6 +261,29 @@
       button:hover { transform: translate(-1px, -1px); }
       button.alt { background: var(--accent); }
       button.warn { background: var(--danger); }
+      .link-action {
+        background: var(--ink);
+        color: #ffffff;
+      }
+      .category-delete {
+        background: var(--danger);
+        color: #ffffff;
+      }
+      html[data-theme="light"] .category-delete {
+        background: var(--accent);
+        color: #ffffff;
+      }
+      html[data-theme="light"] .link-action {
+        background: var(--accent);
+        color: #ffffff;
+      }
+      html[data-theme="dark"] .link-action {
+        background: #1a1a1a;
+        color: #ffffff;
+      }
+      html[data-theme="dark"] .trash-icon-btn {
+        color: #ffffff !important;
+      }
       button.ghost { background: #fff; color: var(--ink); }
       html[data-theme="dark"] button.ghost {
         background: #2a2a2a;
@@ -201,17 +297,42 @@
         flex-wrap: wrap;
       }
 
-      .categories {
-        display: grid;
-        gap: .9rem;
-      }
-
-      .category {
-        background: var(--paper);
+      .categories-pane {
+        min-height: var(--overall-side-height);
+        max-height: var(--overall-side-height);
+        overflow: hidden;
+        align-self: start;
+        padding: .6rem;
         border: 3px solid var(--line);
         border-radius: 12px;
         box-shadow: 6px 6px 0 var(--line);
-        padding: .85rem;
+        background: #ffffff;
+      }
+      html[data-theme="dark"] .categories-pane {
+        background: transparent;
+        box-shadow: none;
+      }
+
+      .categories {
+        display: grid;
+        gap: .9rem;
+        justify-items: start;
+        align-content: start;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        padding-right: .25rem;
+      }
+
+      .category {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 0 .75rem;
+        border-bottom: 2px solid var(--line);
+      }
+      .category:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
       }
 
       .cat-head {
@@ -268,13 +389,20 @@
         background: var(--bg);
       }
 
-      .links { display: grid; gap: .55rem; margin-top: .65rem; }
+      .links {
+        display: grid;
+        gap: .55rem;
+        margin-top: .65rem;
+        width: 100%;
+      }
 
       .link-item {
         border: 2px solid var(--line);
         border-radius: 10px;
         background: #fff;
         padding: .65rem;
+        width: 100%;
+        max-width: 100%;
       }
       html[data-theme="dark"] .link-item {
         background: #171717;
@@ -282,7 +410,6 @@
 
       .link-top {
         display: flex;
-        justify-content: space-between;
         align-items: center;
         gap: .55rem;
       }
@@ -291,6 +418,12 @@
         align-items: center;
         gap: .45rem;
         min-width: 0;
+      }
+      .link-actions {
+        margin-left: auto;
+        display: inline-flex;
+        gap: .45rem;
+        flex: 0 0 auto;
       }
       .favicon {
         width: 16px;
@@ -327,6 +460,120 @@
         justify-content: space-between;
         align-items: center;
       }
+      .clocks-box {
+        border: 3px solid var(--line);
+        border-radius: 12px;
+        background: #fff9d9;
+        padding: .5rem .65rem;
+        min-height: var(--overall-side-height);
+        max-height: var(--overall-side-height);
+        overflow: hidden;
+        box-shadow: 6px 6px 0 var(--line);
+      }
+      html[data-theme="dark"] .clocks-box {
+        background: #1f1f1f;
+        box-shadow: none;
+      }
+      .clocks-side {
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-start;
+        width: 170px;
+      }
+      .clocks-row {
+        display: flex;
+        gap: .45rem;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .clock-tile {
+        border: 2px solid var(--line);
+        border-radius: 10px;
+        background: var(--paper);
+        min-width: 150px;
+        height: var(--side-card-height);
+        padding: .35rem .45rem;
+        display: grid;
+        justify-items: center;
+        gap: .15rem;
+      }
+      html[data-theme="dark"] .clock-tile {
+        background: #171717;
+      }
+      .clock-city {
+        font-size: .72rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .clock-face {
+        width: 68px;
+        height: 68px;
+        display: block;
+      }
+      .clock-dial {
+        fill: #fff;
+        stroke: var(--line);
+        stroke-width: 3;
+      }
+      html[data-theme="dark"] .clock-dial {
+        fill: #151515;
+      }
+      .clock-mark {
+        stroke: var(--line);
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+      .clock-hour {
+        stroke: var(--ink);
+        stroke-width: 3.2;
+        stroke-linecap: round;
+      }
+      .clock-minute {
+        stroke: var(--ink);
+        stroke-width: 2.2;
+        stroke-linecap: round;
+      }
+      .clock-second {
+        stroke: #d33;
+        stroke-width: 1.2;
+        stroke-linecap: round;
+      }
+      .clock-center {
+        fill: var(--line);
+      }
+      .clock-meta {
+        font-size: .72rem;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+        text-align: center;
+      }
+      .clock-digital {
+        font-size: .82rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+      }
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        z-index: 40;
+      }
+      .modal-card {
+        width: min(480px, 100%);
+      }
+      .modal-error {
+        color: #000000;
+      }
+      html[data-theme="dark"] .modal-error {
+        color: #ffffff;
+      }
       .panel-tabs-left {
         display: flex;
         gap: .5rem;
@@ -349,6 +596,7 @@
       }
       html[data-theme="dark"] .theme-toggle {
         background: #2a2a2a;
+        color: #ffffff;
       }
       html[data-theme="dark"] button {
         background: #1a1a1a;
@@ -360,7 +608,6 @@
         color: #ffffff;
       }
       html[data-theme="dark"] .panel,
-      html[data-theme="dark"] .category,
       html[data-theme="dark"] .hero {
         background: #1f1f1f;
       }
@@ -379,7 +626,6 @@
       }
       html[data-theme="dark"] .hero,
       html[data-theme="dark"] .panel,
-      html[data-theme="dark"] .category,
       html[data-theme="dark"] .link-item,
       html[data-theme="dark"] button,
       html[data-theme="dark"] .tab-btn,
@@ -390,6 +636,13 @@
       @media (max-width: 900px) {
         .layout {
           grid-template-columns: 1fr;
+        }
+        .clocks-side {
+          justify-content: flex-start;
+        }
+        .clocks-row {
+          flex-direction: row;
+          overflow-x: auto;
         }
       }
     </style>
@@ -454,6 +707,10 @@
           <span x-text="`Categories: ${totalCategories()} | Links: ${totalLinks()}`"></span>
         </p>
         <p class="joke-line muted" x-text="jokeText"></p>
+        <div class="hero-actions">
+          <button class="alt small" type="button" @click="openCategoryModal()">+ Category</button>
+          <button class="alt small" type="button" @click="openLinkModal()">+ Link</button>
+        </div>
         <div class="panel-tabs">
           <div class="panel-tabs-left">
             <template x-for="panel in panels" :key="panel.id">
@@ -484,105 +741,196 @@
       </section>
 
       <section class="layout">
-        <aside class="stack">
-          <article class="panel">
-            <h2>Create Category</h2>
-            <p class="small" x-show="errorMessage" x-text="errorMessage" style="color:#9a1d1d;"></p>
-            <form class="row" @submit.prevent="addCategory()">
-              <input x-model="newCategory" placeholder="Category name" required />
-              <button class="alt" type="submit">Create</button>
-            </form>
-          </article>
-
-          <article class="panel">
-            <h2>Add / Edit Link</h2>
-            <form @submit.prevent="submitLink()" class="stack">
-              <input x-model="form.name" placeholder="Link name" required />
-              <input x-model="form.url" type="url" placeholder="https://example.com" required />
-              <select x-model.number="form.categoryId" required>
-                <option value="">Select category</option>
-                <template x-for="category in filteredCategories()" :key="category.id">
-                  <option :value="category.id" x-text="category.name"></option>
-                </template>
-              </select>
-              <textarea x-model="form.description" placeholder="Description (optional)"></textarea>
-              <div class="row">
-                <button class="alt" type="submit" x-text="editingId ? 'Save Changes' : 'Add Link'"></button>
-                <button class="ghost" type="button" x-show="editingId" @click="resetForm()">Cancel</button>
-              </div>
-            </form>
-          </article>
-        </aside>
-
-        <section class="categories">
-          <template x-for="category in displayCategories()" :key="category.id">
-            <article class="category">
-              <div class="cat-head" @dragover.prevent @drop.prevent.stop="onCategoryDrop(category.id)">
-                <div class="drag-group">
-                  <span
-                    class="drag-handle"
-                    title="Drag category"
-                    draggable="true"
-                    @dragstart="onCategoryDragStart(category.id, $event)"
-                    @dragend="onDragEnd()"
-                  >::</span>
-                  <h3 class="cat-title">
-                    <span x-text="category.name"></span>
-                    <span class="count-chip" x-text="category.links.length"></span>
-                  </h3>
-                </div>
-                <button class="warn small" @click="deleteCategory(category.id)">Delete Category</button>
-              </div>
-
-              <template x-if="!categoryHasVisibleLinks(category)">
-                <p class="empty small muted" x-text="linkSearch ? 'No matching links.' : 'No links yet.'"></p>
-              </template>
-
-              <div
-                class="links"
-                x-show="categoryHasVisibleLinks(category)"
-                @dragover.prevent
-                @drop.prevent.stop="onLinkDropToCategoryEnd(category.id)"
-              >
-                <template x-for="link in category.links" :key="link.id">
-                  <div
-                    class="link-item"
-                    x-show="matchesLinkSearch(link.name)"
-                    @dragover.prevent
-                    @drop.prevent.stop="onLinkDrop(category.id, link.id, $event)"
-                  >
-                    <div class="link-top">
-                      <div class="link-main">
-                        <span
-                          class="drag-handle"
-                          title="Drag link"
-                          draggable="true"
-                          @dragstart="onLinkDragStart(link.id, category.id, $event)"
-                          @dragend="onDragEnd()"
-                        >::</span>
-                        <img
-                          class="favicon"
-                          :src="getFaviconUrl(link.url)"
-                          @error="onFaviconError($event)"
-                          alt=""
-                          loading="lazy"
-                          decoding="async"
-                        />
-                        <a class="link-name" :href="link.url" target="_blank" rel="noreferrer" x-text="link.name"></a>
-                      </div>
-                      <div class="row">
-                        <button class="ghost small" @click="startEdit(link)">Edit</button>
-                        <button class="warn small" @click="deleteLink(link.id)">Delete</button>
-                      </div>
-                    </div>
-                    <p class="small muted" x-text="link.description"></p>
+        <section class="categories-pane">
+          <section class="categories">
+            <template x-for="category in displayCategories()" :key="category.id">
+              <article class="category">
+                <div class="cat-head" @dragover.prevent @drop.prevent.stop="onCategoryDrop(category.id)">
+                  <div class="drag-group">
+                    <span
+                      class="drag-handle"
+                      title="Drag category"
+                      draggable="true"
+                      @dragstart="onCategoryDragStart(category.id, $event)"
+                      @dragend="onDragEnd()"
+                    >::</span>
+                    <h3 class="cat-title">
+                      <span x-text="category.name"></span>
+                      <span class="count-chip" x-text="category.links.length"></span>
+                    </h3>
                   </div>
+                  <button class="category-delete trash-icon-btn small" @click="deleteCategory(category.id)" aria-label="Delete category" title="Delete category">🗑</button>
+                </div>
+
+                <template x-if="!categoryHasVisibleLinks(category)">
+                  <p class="empty small muted" x-text="linkSearch ? 'No matching links.' : 'No links yet.'"></p>
                 </template>
-              </div>
-            </article>
-          </template>
+
+                <div
+                  class="links"
+                  x-show="categoryHasVisibleLinks(category)"
+                  @dragover.prevent
+                  @drop.prevent.stop="onLinkDropToCategoryEnd(category.id)"
+                >
+                  <template x-for="link in category.links" :key="link.id">
+                    <div
+                      class="link-item"
+                      x-show="matchesLinkSearch(link.name)"
+                      @dragover.prevent
+                      @drop.prevent.stop="onLinkDrop(category.id, link.id, $event)"
+                    >
+                      <div class="link-top">
+                        <div class="link-main">
+                          <span
+                            class="drag-handle"
+                            title="Drag link"
+                            draggable="true"
+                            @dragstart="onLinkDragStart(link.id, category.id, $event)"
+                            @dragend="onDragEnd()"
+                          >::</span>
+                          <img
+                            class="favicon"
+                            :src="getFaviconUrl(link.url)"
+                            @error="onFaviconError($event)"
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                          />
+                          <a class="link-name" :href="link.url" target="_blank" rel="noreferrer" x-text="link.name"></a>
+                        </div>
+                        <div class="link-actions">
+                          <button class="link-action small" @click="startEdit(link)" aria-label="Edit link" title="Edit link">✎</button>
+                          <button class="link-action trash-icon-btn small" @click="deleteLink(link.id)" aria-label="Delete link" title="Delete link">🗑</button>
+                        </div>
+                      </div>
+                      <p class="small muted" x-text="link.description"></p>
+                    </div>
+                  </template>
+                </div>
+              </article>
+            </template>
+          </section>
         </section>
+        <aside class="panel news-pane">
+          <h2>Google News Global</h2>
+          <div class="news-scroll">
+            <p class="small muted" x-show="newsError" x-text="newsError"></p>
+            <div class="news-list" x-show="newsItems.length">
+              <template x-for="item in newsItems" :key="item.link">
+                <article class="news-item">
+                  <img
+                    class="news-thumb"
+                    x-show="item.image"
+                    :src="item.image"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <a class="news-link" :href="item.link" target="_blank" rel="noreferrer" x-text="item.title"></a>
+                  <p class="news-meta" x-text="item.source ? `${item.source} | ${item.pubDate}` : item.pubDate"></p>
+                </article>
+              </template>
+            </div>
+            <p class="small muted" x-show="!newsItems.length && !newsError">No news available right now.</p>
+          </div>
+        </aside>
+        <aside class="clocks-side">
+          <div class="clocks-box">
+            <div class="clocks-row">
+              <template x-for="clock in worldClocks" :key="clock.city">
+                <div class="clock-tile">
+                  <span class="clock-city" x-text="clock.city"></span>
+                  <svg class="clock-face" viewBox="0 0 100 100" aria-hidden="true">
+                    <circle class="clock-dial" cx="50" cy="50" r="46"></circle>
+                    <line class="clock-mark" x1="50" y1="10" x2="50" y2="16"></line>
+                    <line class="clock-mark" x1="90" y1="50" x2="84" y2="50"></line>
+                    <line class="clock-mark" x1="50" y1="90" x2="50" y2="84"></line>
+                    <line class="clock-mark" x1="10" y1="50" x2="16" y2="50"></line>
+                    <line
+                      class="clock-hour"
+                      x1="50"
+                      y1="50"
+                      x2="50"
+                      y2="30"
+                      :transform="`rotate(${clock.hourDeg} 50 50)`"
+                    ></line>
+                    <line
+                      class="clock-minute"
+                      x1="50"
+                      y1="50"
+                      x2="50"
+                      y2="22"
+                      :transform="`rotate(${clock.minuteDeg} 50 50)`"
+                    ></line>
+                    <line
+                      class="clock-second"
+                      x1="50"
+                      y1="54"
+                      x2="50"
+                      y2="18"
+                      :transform="`rotate(${clock.secondDeg} 50 50)`"
+                    ></line>
+                    <circle class="clock-center" cx="50" cy="50" r="2.8"></circle>
+                  </svg>
+                  <span class="clock-digital" x-text="clock.time"></span>
+                  <span class="clock-meta" x-text="clock.meta"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+        </aside>
       </section>
+
+      <div
+        class="modal-backdrop"
+        x-cloak
+        x-show="showCategoryModal"
+        @click.self="closeCategoryModal()"
+      >
+        <article class="panel modal-card">
+          <h2>Create Category</h2>
+          <p class="small modal-error" x-show="categoryErrorMessage" x-text="categoryErrorMessage"></p>
+          <form class="stack" @submit.prevent="addCategory()">
+            <input
+              x-model="newCategory"
+              placeholder="Category name"
+              required
+              @keydown.escape.window="closeCategoryModal()"
+            />
+            <div class="row">
+              <button class="alt" type="submit">Create</button>
+              <button class="ghost" type="button" @click="closeCategoryModal()">Cancel</button>
+            </div>
+          </form>
+        </article>
+      </div>
+
+      <div
+        class="modal-backdrop"
+        x-cloak
+        x-show="showLinkModal"
+        @click.self="closeLinkModal()"
+      >
+        <article class="panel modal-card">
+          <h2>Add / Edit Link</h2>
+          <p class="small modal-error" x-show="linkErrorMessage" x-text="linkErrorMessage"></p>
+          <form @submit.prevent="submitLink()" class="stack">
+            <input x-model="form.name" placeholder="Link name" required />
+            <input x-model="form.url" type="url" placeholder="https://example.com" required />
+            <select x-model.number="form.categoryId" required>
+              <option value="">Select category</option>
+              <template x-for="category in filteredCategories()" :key="category.id">
+                <option :value="category.id" x-text="category.name"></option>
+              </template>
+            </select>
+            <textarea x-model="form.description" placeholder="Description (optional)"></textarea>
+            <div class="row">
+              <button class="alt" type="submit" x-text="editingId ? 'Save Changes' : 'Add Link'"></button>
+              <button class="ghost" type="button" @click="closeLinkModal()">Cancel</button>
+            </div>
+          </form>
+        </article>
+      </div>
     </main>
 
     <script is:inline>
@@ -593,21 +941,31 @@
 
         return {
           inactivityMs: 30 * 1000,
+          newsRefreshMs: 5 * 60 * 1000,
           inactivityTimer: null,
+          newsTimer: null,
           theme: 'light',
           profile: { name: 'Loading...', title: '', email: '' },
           panels: [],
           activePanelId: null,
           categories: [],
           linkSearch: '',
+          newsItems: [],
+          newsError: '',
           dragPanelId: null,
           dragCategoryId: null,
           dragLinkId: null,
           dragFromCategoryId: null,
           errorMessage: '',
+          categoryErrorMessage: '',
+          linkErrorMessage: '',
+          showCategoryModal: false,
+          showLinkModal: false,
           newCategory: '',
           timeDisplay: '',
           todayDisplay: '',
+          worldClocks: [],
+          clocksIntervalId: null,
           jokeText: 'Loading a joke...',
           jokeLoaded: false,
           editingId: null,
@@ -633,8 +991,10 @@
               day: 'numeric',
               year: 'numeric'
             });
-            await this.loadJoke();
-            await this.load();
+            this.updateClocks();
+            this.clocksIntervalId = window.setInterval(() => this.updateClocks(), 1000);
+            await Promise.all([this.loadJoke(), this.load(), this.loadNews()]);
+            this.setupNewsAutoRefresh();
           },
 
           toggleTheme() {
@@ -643,6 +1003,28 @@
             try {
               localStorage.setItem('dashboard-theme', this.theme);
             } catch {}
+          },
+
+          openCategoryModal() {
+            this.categoryErrorMessage = '';
+            this.showCategoryModal = true;
+          },
+
+          closeCategoryModal() {
+            this.showCategoryModal = false;
+            this.newCategory = '';
+            this.categoryErrorMessage = '';
+          },
+
+          openLinkModal() {
+            this.linkErrorMessage = '';
+            this.showLinkModal = true;
+          },
+
+          closeLinkModal() {
+            this.showLinkModal = false;
+            this.linkErrorMessage = '';
+            this.resetForm();
           },
 
           setupInactivityWatcher() {
@@ -659,6 +1041,13 @@
               });
 
             resetTimer();
+          },
+
+          setupNewsAutoRefresh() {
+            if (this.newsTimer) clearInterval(this.newsTimer);
+            this.newsTimer = setInterval(() => {
+              this.loadNews();
+            }, this.newsRefreshMs);
           },
 
           setupPanelHotkeys() {
@@ -682,6 +1071,46 @@
 
               event.preventDefault();
               this.switchPanel(targetPanel.id);
+            });
+          },
+
+          updateClocks() {
+            const now = new Date();
+            const timeParts = (timeZone) => {
+              const parts = new Intl.DateTimeFormat('en-US', {
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric',
+                hour12: false,
+                timeZone
+              }).formatToParts(now);
+              const read = (type) => Number(parts.find((part) => part.type === type)?.value || 0);
+              return { hour: read('hour'), minute: read('minute'), second: read('second') };
+            };
+            const formatDigital = ({ hour, minute, second }) =>
+              `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
+            const formatMeta = (timeZone) => now.toLocaleString(undefined, {
+              weekday: 'short',
+              month: 'short',
+              day: 'numeric',
+              timeZoneName: 'short',
+              timeZone
+            });
+            this.worldClocks = [
+              { city: 'New York', zone: 'America/New_York' },
+              { city: 'Berlin', zone: 'Europe/Berlin' },
+              { city: 'Chennai', zone: 'Asia/Kolkata' },
+              { city: 'Japan', zone: 'Asia/Tokyo' }
+            ].map((item) => {
+              const t = timeParts(item.zone);
+              return {
+                hourDeg: ((t.hour % 12) * 30) + (t.minute * 0.5),
+                minuteDeg: (t.minute * 6) + (t.second * 0.1),
+                secondDeg: t.second * 6,
+                city: item.city,
+                time: formatDigital(t),
+                meta: formatMeta(item.zone)
+              };
             });
           },
 
@@ -729,6 +1158,21 @@
             }
             this.errorMessage = '';
             log('load:done', { categories: this.categories.length });
+          },
+
+          async loadNews() {
+            try {
+              const response = await fetch('/api/news/global.json');
+              if (!response.ok) {
+                throw new Error(`News request failed with ${response.status}`);
+              }
+              const data = await response.json();
+              this.newsItems = Array.isArray(data?.items) ? data.items : [];
+              this.newsError = '';
+            } catch {
+              this.newsItems = [];
+              this.newsError = 'Failed to load global news.';
+            }
           },
 
           filteredCategories() {
@@ -1002,16 +1446,17 @@
             });
             if (!response.ok) {
               const payload = await response.json().catch(() => ({}));
-              this.errorMessage = payload.error || 'Failed to create category';
+              this.categoryErrorMessage = payload.error || 'Failed to create category';
               return;
             }
             const created = await response.json().catch(() => ({}));
             this.newCategory = '';
-            this.errorMessage = '';
+            this.categoryErrorMessage = '';
             await this.load();
             if (created?.panel_id) {
               this.activePanelId = created.panel_id;
             }
+            this.showCategoryModal = false;
           },
 
           startEdit(link) {
@@ -1027,6 +1472,8 @@
               description: link.description,
               categoryId: link.category_id
             };
+            this.linkErrorMessage = '';
+            this.showLinkModal = true;
           },
 
           resetForm() {
@@ -1060,12 +1507,13 @@
 
             if (!response.ok) {
               const payloadError = await response.json().catch(() => ({}));
-              this.errorMessage = payloadError.error || 'Failed to save link';
+              this.linkErrorMessage = payloadError.error || 'Failed to save link';
               return;
             }
 
             this.resetForm();
-            this.errorMessage = '';
+            this.linkErrorMessage = '';
+            this.showLinkModal = false;
             await this.load();
           },
 
@@ -1077,7 +1525,13 @@
 
           async deleteCategory(id) {
             log('category:delete', { id });
-            await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+            const response = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+            if (!response.ok) {
+              const payload = await response.json().catch(() => ({}));
+              const message = payload.error || 'Failed to delete category';
+              window.alert(message);
+              return;
+            }
             if (this.form.categoryId === id) this.resetForm();
             await this.load();
           }
