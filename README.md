@@ -108,7 +108,7 @@ npm run dev
 2. Architecture needs to redesigned to 3-tier.
 
 ## Development Attribution
-- Principal developer: Codex (GPT-5 coding agent).
+- Principal developer: Codex (GPT-5 coding agent). _// old N00b 👴 assisted a bit_
 - Collaboration model: iterative prompt-driven development in the local repo with incremental implementation, debugging, and UX refinement.
 
 ### Prompt Summary (Consolidated)
