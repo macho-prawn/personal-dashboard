@@ -1,6 +1,8 @@
 # Personal Dashboard
 A personal  dashboard built with Astro + Alpine.js + PostgreSQL, containerized with Docker Compose.
 
+![Dark-Mode Dashboard](images/dashboard_lightmode_screenshot.png)
+
 ## Table of Contents
 - [Main Features](#main-features)
 - [Tech Stack](#tech-stack)
