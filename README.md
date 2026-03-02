@@ -6,7 +6,6 @@ A personal  dashboard built with Astro + Alpine.js + PostgreSQL, containerized w
 - [Tech Stack](#tech-stack)
 - [Data Model (Current)](#data-model-current)
 - [Architecture Diagram](#architecture-diagram)
-- [Incremental Updates](#incremental-updates)
 - [Run with Docker](#run-with-docker)
 - [Local Development](#local-development)
 - [TODO](#todo)
@@ -14,25 +13,45 @@ A personal  dashboard built with Astro + Alpine.js + PostgreSQL, containerized w
 - [Environment Variables](#environment-variables)
 
 ## Main Features
-- Dynamic panels (tabs): panel lifecycle is tied to category lifecycle.
-- Category creates a panel automatically; deleting that category removes the empty panel.
-- Panel switcher at top with keyboard shortcuts: `1` to `9`.
-- Drag-and-drop ordering with persistence:
-  - Panels reorder (before/after).
-  - Categories reorder inside current panel.
-  - Links reorder before/after inside category.
-  - Links move across categories and across panels (drop on panel tab).
-- Profile header metadata:
-  - `Name | Title | Email | Time TZ | Day, Month Date, Year | Category Count | Link Count`
-- Random Chuck Norris joke displayed below header.
-- Optional link description field.
-- Inactivity auto-refresh timer.
-- Light/Dark theme toggle with:
-  - localStorage persistence
-  - system-theme fallback on first visit
-  - pre-paint theme application to avoid flash
-- API/server logging for key operations.
-- Persistent storage for PostgreSQL.
+- Personal profile header with:
+  - `Name | Title | Email | Time TZ | Day, Month Date, Year | Categories Count | Links Count`
+  - Chuck Norris joke line under the header
+  - `+ Category` and `+ Link` modal-trigger buttons
+- Dynamic panel system (tabs):
+  - Panels are derived from categories (category lifecycle drives panel lifecycle)
+  - Panel switcher with keyboard shortcuts (`1` to `9`)
+  - Panel drag-and-drop supports both directions (before/after behavior)
+- Category and link management:
+  - Category create modal with inline duplicate-error messaging
+  - Category delete blocked until all links in that category are deleted
+  - Link create/edit modal with inline error messaging
+  - Link description is optional
+  - Duplicate link names are blocked globally across all categories
+- Drag-and-drop with DB persistence:
+  - Reorder panels, categories, and links
+  - Drop links before/after other links
+  - Move links across categories and across panels (drop on panel tabs)
+- Search:
+  - Link-name search from the top bar
+  - Search scans links across categories
+- Link visuals:
+  - Auto-fetched favicon for each link
+  - Fallback icon if site favicon is unavailable
+- News pane:
+  - Dedicated Google News Global pane (headline links + images)
+  - Auto-refreshes independently (no full-page reload)
+- World clocks:
+  - Right-side analog clocks with live hands and digital `hh:mm:ss`
+  - Cities: New York, Berlin, Chennai, Japan
+- Theme and UX behavior:
+  - Light/Dark theme toggle (bulb icon)
+  - Theme persisted in `localStorage`
+  - First-visit system-theme fallback
+  - Theme applied pre-paint to avoid flash
+  - Inactivity-based page reload timer
+- Diagnostics and operations:
+  - API/server logging for key operations
+  - Dockerized runtime with PostgreSQL persistence
 
 ## Tech Stack
 - Frontend: <a href="//ahastack.dev" target="_blank">Astro + HTMX + Alpine.js</a>
@@ -52,42 +71,13 @@ flowchart LR
   U[Browser UI\nAstro + Alpine] --> API[Astro Server/API]
   API --> DB[(PostgreSQL)]
   API --> J[Chuck Norris Joke API]
+  API --> G[Google News RSS API]
   U --> F[Favicon Service]
 
   DB --- P[(panels)]
   DB --- C[(categories)]
   DB --- L[(links)]
 ```
-
-## Incremental Updates
-- Panel drag-and-drop improved:
-  - Panels can be reordered both left-to-right and right-to-left.
-  - Drop logic supports before/after placement.
-- Link drag behavior improved:
-  - Links can be dropped before or after another link (based on drop position).
-  - Cross-panel link moves supported by dropping links on panel tabs.
-- Category header updated:
-  - Removed category index display.
-  - Shows only link count next to category name.
-- Theme updates:
-  - Theme toggle now uses a bulb icon.
-  - Filled bulb in light mode, outlined bulb in dark mode.
-  - Dark theme contrast tuned for better readability.
-  - Dark mode supports first-visit system preference fallback.
-- Link favicon support:
-  - Favicon auto-fetched from link URL for existing and new links.
-  - Fallback icon graphic shown when favicon is unavailable.
-- Link form update:
-  - Description field is optional.
-- Search and validation updates:
-  - Link search bar now searches links across all categories.
-  - Duplicate link names are blocked within the same category.
-- Drag-and-drop updates:
-  - Panel drag/drop handling fixed for both right-to-left and left-to-right reordering.
-- Theme updates (latest):
-  - Dark theme button text and active panel text adjusted for readability.
-  - Dark theme shadow effects removed from bordered boxes.
-  - Theme toggle icon changed to bulb (filled in light mode, outlined in dark mode).
 
 ## Run with Docker
 1. Copy env file:
@@ -116,31 +106,25 @@ npm run dev
 2. Architecture needs to redesigned to 3-tier.
 
 ## Development Attribution
-- Principal developer: Codex (GPT-5 coding agent). // old N00b 👴 assisted a bit
+- Principal developer: Codex (GPT-5 coding agent).
 - Collaboration model: iterative prompt-driven development in the local repo with incremental implementation, debugging, and UX refinement.
 
-### Prompt Summary (High-Level)
-- Initial build: create a personal link dashboard using Astro/Alpine + PostgreSQL with Docker Compose.
-- Core CRUD: add categories/links create/edit/delete flows with logging.
-- Reliability fixes: resolve server connectivity/reset issues and environment variable wiring.
-- Feature changes:
-  - Remove random saying functionality.
-  - Add dynamic panels and panel switcher behavior.
-  - Add drag-and-drop ordering with DB persistence for panels/categories/links.
-  - Add cross-category and cross-panel link movement.
-  - Make link description optional.
-  - Add favicon rendering for links with fallback icon.
-- UX updates:
-  - Redesign visual style and refine typography/layout.
-  - Add date/time metadata line in header.
-  - Add keyboard shortcuts (`1`-`9`) for panel switching.
-  - Add inactivity auto-refresh behavior.
-  - Add light/dark theme toggle with persistence and first-visit system fallback.
-  - Tune dark mode colors, contrast, and icon behavior.
-- Documentation updates:
-  - Expand README features and operational details.
-  - Add Mermaid architecture diagram.
-  - Add API-method-to-table entity mapping.
+### Prompt Summary (Consolidated)
+- Build a personal link dashboard with Astro + Alpine + PostgreSQL, Dockerfile, and Docker Compose.
+- Variabilize `DATABASE_URL`; fix Astro connection reset and browser runtime errors.
+- Remove old random-saying feature; add Chuck Norris joke line and control duplicate fetch behavior.
+- Implement panelized architecture with dynamic panel lifecycle from categories.
+- Add full CRUD for categories/links, modal-based create/edit UX, and logging visibility.
+- Add drag-and-drop ordering for panels/categories/links with DB persistence, including cross-panel link moves.
+- Add keyboard shortcuts (`1`-`9`) for panel switching and inactivity-based refresh.
+- Add theme system: light/dark toggle, first-visit system fallback, pre-paint apply, and iterative dark-mode contrast tuning.
+- Add favicon support with fallback graphic.
+- Add world clocks (analog + digital), then multiple layout/styling passes to align pane sizing and responsiveness.
+- Add Google News Global pane (headline links + images) with independent auto-refresh.
+- Enforce data rules:
+  - block duplicate link names globally
+  - block category deletion until all links in that category are removed
+- Continue iterative UI polish based on prompt feedback (buttons/icons, pane borders, spacing, shadows, and visibility).
 
 ## Environment Variables
 See `.env.example` for all available variables.
