@@ -21,6 +21,7 @@ A personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized wi
   - `Name | Title | Email | Time TZ | Day, Month Date, Year | Categories Count | Links Count`
   - Chuck Norris joke line under the header
   - `+ Category` and `+ Link` modal-trigger buttons
+  - `DB Backup/Restore` control beside the theme toggle
 - Dynamic panel system (tabs):
   - Panels are derived from categories (category lifecycle drives panel lifecycle)
   - Panel switcher with keyboard shortcuts (`1` to `9`)
@@ -52,16 +53,20 @@ A personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized wi
   - Theme persisted in `localStorage`
   - First-visit system-theme fallback
   - Theme applied pre-paint to avoid flash
+  - Shared button theme rules so new buttons inherit light/dark styling automatically
   - Inactivity-based page reload timer
 - Diagnostics and operations:
   - API/server logging for key operations
   - Dockerized runtime with PostgreSQL persistence
-  - Secret-protected manual database backup and latest-backup restore from the dashboard
+  - Secret-protected manual database backup and restore from the dashboard
+  - Restore picker limited to the five newest backups
+  - Automatic deletion of older backup files when a new backup exceeds the five-backup cap
+  - Post-restore restart-required lockout that greys out the dashboard until the app is restarted
 
 [Back to top](#top)
 
 ## Tech Stack
-- Frontend: <a href="//ahastack.dev" target="_blank">Astro + HTMX + Alpine.js</a>
+- Frontend: <a href="//ahastack.dev" target="_blank">Astro + Alpine.js</a>
 - Data: <a href="https://hub.docker.com/_/postgres" target="_blank">PostgreSQL</a>
 - Runtime/Deployment: <a href="https://docs.docker.com/engine/install/ubuntu" target="_blank">Docker + Docker Compose</a>
 - HostOS / Virtualization: Windows 11 / Hyper-V
@@ -97,20 +102,23 @@ flowchart LR
    ```bash
    cp .env.example .env
    ```
-2. Start:
+2. Start the stack from the repo root:
    ```bash
    docker compose up -f docker-compose.yml --env-file .env --build --detached
    ```
-2. Stop:
+3. Open the dashboard:
+   `http://localhost:8080`
+   If you change `APP_PORT` in `.env`, use that port instead.
+4. Stop the stack:
    ```bash
    docker compose -f docker-compose.yml --env-file .env down
    ```
-3. Open:
-   `http://<your_url>:8080`
 
 [Back to top](#top)
 
 ## Local Development
+The app source now lives under `docker/`.
+
 ```bash
 cd docker
 npm install
@@ -174,6 +182,6 @@ With database ops enabled, use the `DB Backup/Restore` button in the dashboard t
 
 - Create an immediate PostgreSQL backup. Only the five most recent backup files are kept; creating a sixth or later backup deletes the older backup files.
 - Restore one of the five most recent backup files, labeled from the backup timestamp as `day/month/year hours/minutes/seconds`.
-- Restart the personal-dashboard after a restore so the restored database is picked up; the UI stays locked until the app is restarted.
+- Restart the personal-dashboard after a restore so the restored database is picked up; the UI stays locked and mouse interaction is blocked until the app is restarted.
 
 [Back to top](#top)
