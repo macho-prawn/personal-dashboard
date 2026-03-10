@@ -1,3 +1,5 @@
+<a id="top"></a>
+
 # Personal Dashboard
 A personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized with Docker Compose.
 
@@ -54,6 +56,9 @@ A personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized wi
 - Diagnostics and operations:
   - API/server logging for key operations
   - Dockerized runtime with PostgreSQL persistence
+  - Secret-protected manual database backup and latest-backup restore from the dashboard
+
+[Back to top](#top)
 
 ## Tech Stack
 - Frontend: <a href="//ahastack.dev" target="_blank">Astro + HTMX + Alpine.js</a>
@@ -62,10 +67,14 @@ A personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized wi
 - HostOS / Virtualization: Windows 11 / Hyper-V
 - Linux Emulation: <a href="https://learn.microsoft.com/en-us/windows/wsl/install" target="_blank">WSL Ubuntu</a>
 
+[Back to top](#top)
+
 ## Data Model (Current)
 - `panels`: ordered tabs (`sort_order`)
 - `categories`: belongs to panel (`panel_id`, `sort_order`)
 - `links`: belongs to category (`category_id`, `sort_order`)
+
+[Back to top](#top)
 
 ## Architecture Diagram
 ```mermaid
@@ -81,6 +90,8 @@ flowchart LR
   DB --- L[(links)]
 ```
 
+[Back to top](#top)
+
 ## Run with Docker
 1. Copy env file:
    ```bash
@@ -88,28 +99,46 @@ flowchart LR
    ```
 2. Start:
    ```bash
-   docker compose up --build --detached
+   docker compose up -f docker-compose.yml --env-file .env --build --detached
    ```
 2. Stop:
    ```bash
-   docker compose down
+   docker compose -f docker-compose.yml --env-file .env down
    ```
 3. Open:
    `http://<your_url>:8080`
 
+[Back to top](#top)
+
 ## Local Development
 ```bash
+cd docker
 npm install
 npm run dev
 ```
+
+[Back to top](#top)
 
 ## TODO
 1. Integrate TLS/SSL.
 2. Architecture needs to redesigned to 3-tier.
 
+[Back to top](#top)
+
 ## Development Attribution
 - Principal developer: Codex (GPT-5 coding agent). _// old N00b 👴 assisted a bit_
 - Collaboration model: iterative prompt-driven development in the local repo with incremental implementation, debugging, and UX refinement.
+
+### Prompt Summary (2026-03-10)
+- Add README back-to-top anchors without changing existing TOC anchors or contents.
+- Implement manual PostgreSQL backup and restore from the dashboard, protected by an admin secret.
+- Rename `.env_example` to `.env.example`, move the app source/build files under `docker/`, and update Docker Compose/build references.
+- Verify backup/restore live in Docker, then fix PostgreSQL client/server version mismatch in the app image.
+- Rename `DB Ops` to `DB Backup/Restore`, move the control beside the theme toggle, and switch restore from latest-only to selecting one of the five newest backups.
+- Format restore names from backup timestamps, enforce a hard 5-backup retention cap, and delete older backups when new ones exceed that cap.
+- Unify button theming so dark mode uses white button text and light mode uses green buttons with white text via shared theme variables.
+- After restore, require a personal-dashboard restart, gray out the UI, block clicks, and keep the dashboard locked until the app restarts.
+- Repeatedly rebuild, restart, and verify the app/database stack with `docker compose`.
 
 ### Prompt Summary (Consolidated)
 - Build a personal link dashboard with Astro + Alpine + PostgreSQL, Dockerfile, and Docker Compose.
@@ -128,5 +157,23 @@ npm run dev
   - block category deletion until all links in that category are removed
 - Continue iterative UI polish based on prompt feedback (buttons/icons, pane borders, spacing, shadows, and visibility).
 
+[Back to top](#top)
+
 ## Environment Variables
 See `.env.example` for all available variables.
+
+Manual database operations are controlled by:
+
+- `DB_OPS_ENABLED`: enable the in-app backup/restore controls.
+- `DB_OPS_SECRET`: required admin secret for backup/restore API calls.
+- `DB_BACKUP_DIR`: backup directory inside the app container.
+- `DB_BACKUP_VOLUME`: host path mounted to the backup directory.
+- `DB_BACKUP_RETENTION_DAYS`: delete backups older than this after each successful backup.
+
+With database ops enabled, use the `DB Backup/Restore` button in the dashboard to:
+
+- Create an immediate PostgreSQL backup. Only the five most recent backup files are kept; creating a sixth or later backup deletes the older backup files.
+- Restore one of the five most recent backup files, labeled from the backup timestamp as `day/month/year hours/minutes/seconds`.
+- Restart the personal-dashboard after a restore so the restored database is picked up; the UI stays locked until the app is restarted.
+
+[Back to top](#top)

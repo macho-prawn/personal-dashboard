@@ -3,7 +3,7 @@ import { logger } from './logger.js';
 
 const { Pool } = pg;
 
-const buildConnectionString = () => {
+export const getConnectionString = () => {
   if (process.env.DATABASE_URL) {
     return process.env.DATABASE_URL;
   }
@@ -26,7 +26,7 @@ const buildConnectionString = () => {
   return `${protocol}://${encodedUser}:${encodedPassword}@${host}:${port}/${database}`;
 };
 
-const connectionString = buildConnectionString();
+const connectionString = getConnectionString();
 logger.info('Database connection configured', {
   source: process.env.DATABASE_URL ? 'DATABASE_URL' : 'DB_* variables'
 });
