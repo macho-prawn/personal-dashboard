@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - 5432:5432
     volumes:
       - pg_data:/var/lib/postgresql/data
     user: ${DB_UID}:${DB_GID}
@@ -19,7 +19,7 @@ services:
 
   app:
     build:
-      context: .
+      context: ./docker
       dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
@@ -36,8 +36,14 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      DB_OPS_ENABLED: ${DB_OPS_ENABLED}
+      DB_OPS_SECRET: ${DB_OPS_SECRET}
+      DB_BACKUP_DIR: /app/db-backup
+      DB_BACKUP_RETENTION_DAYS: ${DB_BACKUP_RETENTION_DAYS}
     ports:
       - "${APP_PORT}:${APP_PORT}"
+    volumes:
+      - pg_backup:/app/db-backup
 
 volumes:
   pg_data:
@@ -46,3 +52,9 @@ volumes:
       type: none
       o: bind
       device: ${DB_VOLUME}
+  pg_backup:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DB_BACKUP_VOLUME}

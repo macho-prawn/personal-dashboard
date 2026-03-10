@@ -1,5 +1,7 @@
 import { query } from '../../lib/db.js';
+import { getDbOpsUiConfig, listDatabaseBackups } from '../../lib/dbOps.js';
 import { logger } from '../../lib/logger.js';
+import { APP_INSTANCE_ID } from '../../lib/runtime.js';
 
 export const GET = async () => {
   try {
@@ -20,6 +22,11 @@ export const GET = async () => {
       links: linksRes.rows.filter((link) => link.category_id === category.id)
     }));
 
+    const dbOps = getDbOpsUiConfig();
+    if (dbOps.enabled) {
+      dbOps.backups = await listDatabaseBackups({ limit: dbOps.restoreLimit });
+    }
+
     return new Response(
       JSON.stringify({
         profile: {
@@ -27,6 +34,8 @@ export const GET = async () => {
           title: process.env.APP_USERTITLE || 'Software Engineer',
           email: process.env.APP_USEREMAIL || 'you@example.com'
         },
+        appInstanceId: APP_INSTANCE_ID,
+        dbOps,
         panels: panelsRes.rows,
         categories
       }),

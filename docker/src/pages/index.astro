@@ -32,6 +32,9 @@
         --danger: #9a1d1d;
         --accent: #1a6f4b;
         --line: #111111;
+        --button-bg: #1a6f4b;
+        --button-bg-active: #14563a;
+        --button-text: #ffffff;
         --side-card-height: 154px;
         --overall-side-height: calc((var(--side-card-height) * 4) + (0.45rem * 3) + 1rem);
       }
@@ -43,6 +46,9 @@
         --danger: #ff6b6b;
         --accent: #4fc98c;
         --line: #ffd319;
+        --button-bg: #1a1a1a;
+        --button-bg-active: #2a2a2a;
+        --button-text: #ffffff;
         color-scheme: dark;
       }
 
@@ -72,6 +78,15 @@
         padding: 1.2rem;
         zoom: 0.75;
       }
+      .app-shell {
+        transition: filter .2s ease, opacity .2s ease;
+      }
+      .app-shell.app-shell-locked {
+        filter: grayscale(1);
+        opacity: 0.45;
+        pointer-events: none;
+        user-select: none;
+      }
 
       .hero {
         background: var(--paper);
@@ -88,6 +103,13 @@
         justify-content: space-between;
         gap: .6rem;
       }
+      .hero-tools {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
 
       .badge {
         width: fit-content;
@@ -101,8 +123,6 @@
         text-transform: uppercase;
       }
       .theme-toggle {
-        background: transparent;
-        color: var(--ink);
         width: 2rem;
         height: 2rem;
         padding: .2rem;
@@ -250,8 +270,8 @@
 
       button {
         border: 2px solid var(--line);
-        background: var(--ink);
-        color: #fff;
+        background: var(--button-bg);
+        color: var(--button-text);
         padding: .5rem .7rem;
         font-weight: 700;
         cursor: pointer;
@@ -259,35 +279,11 @@
       }
 
       button:hover { transform: translate(-1px, -1px); }
-      button.alt { background: var(--accent); }
-      button.warn { background: var(--danger); }
-      .link-action {
-        background: var(--ink);
-        color: #ffffff;
-      }
-      .category-delete {
-        background: var(--danger);
-        color: #ffffff;
-      }
-      html[data-theme="light"] .category-delete {
-        background: var(--accent);
-        color: #ffffff;
-      }
-      html[data-theme="light"] .link-action {
-        background: var(--accent);
-        color: #ffffff;
-      }
-      html[data-theme="dark"] .link-action {
-        background: #1a1a1a;
-        color: #ffffff;
-      }
-      html[data-theme="dark"] .trash-icon-btn {
-        color: #ffffff !important;
-      }
-      button.ghost { background: #fff; color: var(--ink); }
-      html[data-theme="dark"] button.ghost {
-        background: #2a2a2a;
-        color: var(--ink);
+      button.alt,
+      button.warn,
+      button.ghost {
+        background: var(--button-bg);
+        color: var(--button-text);
       }
 
       .row {
@@ -568,6 +564,25 @@
       .modal-card {
         width: min(480px, 100%);
       }
+      .ops-note {
+        margin: 0;
+        line-height: 1.4;
+      }
+      .ops-status {
+        margin: 0;
+        font-weight: 700;
+      }
+      .ops-status.success {
+        color: var(--accent);
+      }
+      .ops-status.error {
+        color: var(--danger);
+      }
+      .ops-actions {
+        display: flex;
+        gap: .6rem;
+        flex-wrap: wrap;
+      }
       .modal-error {
         color: #000000;
       }
@@ -591,21 +606,8 @@
         gap: .35rem;
       }
       .tab-btn.active {
-        background: var(--accent);
-        color: #fff;
-      }
-      html[data-theme="dark"] .theme-toggle {
-        background: #2a2a2a;
-        color: #ffffff;
-      }
-      html[data-theme="dark"] button {
-        background: #1a1a1a;
-        color: #ffd319;
-      }
-      html[data-theme="dark"] button.alt,
-      html[data-theme="dark"] button.warn {
-        background: #1a1a1a;
-        color: #ffffff;
+        background: var(--button-bg-active);
+        color: var(--button-text);
       }
       html[data-theme="dark"] .panel,
       html[data-theme="dark"] .hero {
@@ -617,12 +619,7 @@
         color: var(--ink);
       }
       html[data-theme="dark"] .tab-btn {
-        background: #2a2a2a;
-        color: var(--ink);
-      }
-      html[data-theme="dark"] .tab-btn.active {
-        background: #1a1a1a;
-        color: #ffffff;
+        color: var(--button-text);
       }
       html[data-theme="dark"] .hero,
       html[data-theme="dark"] .panel,
@@ -631,6 +628,24 @@
       html[data-theme="dark"] .tab-btn,
       html[data-theme="dark"] .drag-handle {
         box-shadow: none;
+      }
+      .restart-lock {
+        position: fixed;
+        inset: 0;
+        z-index: 90;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: rgba(128, 128, 128, 0.58);
+      }
+      .restart-lock-card {
+        width: min(460px, 100%);
+        text-align: center;
+      }
+      .restart-lock-card p {
+        margin: 0;
+        line-height: 1.5;
       }
 
       @media (max-width: 900px) {
@@ -648,50 +663,60 @@
     </style>
   </head>
   <body>
-    <main class="wrap" x-data="dashboardApp()">
+    <div x-data="dashboardApp()">
+    <main class="wrap app-shell" :class="{ 'app-shell-locked': appLocked }">
       <section class="hero">
         <div class="hero-top">
           <span class="badge">BootCamp / Week1 / Personal Dashboard</span>
-          <button
-            type="button"
-            class="theme-toggle"
-            @click="toggleTheme()"
-            :title="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
-            :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
-          >
-            <svg
-              x-show="theme === 'light'"
-              viewBox="0 0 24 24"
-              width="14"
-              height="14"
-              fill="currentColor"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
+          <div class="hero-tools">
+            <button
+              class="small"
+              type="button"
+              x-show="dbOps.enabled"
+              x-cloak
+              @click="openDbOpsModal()"
+            >DB Backup/Restore</button>
+            <button
+              type="button"
+              class="theme-toggle"
+              @click="toggleTheme()"
+              :title="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+              :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
             >
-              <path d="M9 18h6"></path>
-              <path d="M10 21h4"></path>
-              <path d="M12 2a7 7 0 0 0-4 12.8V17h8v-2.2A7 7 0 0 0 12 2z"></path>
-            </svg>
-            <svg
-              x-show="theme === 'dark'"
-              viewBox="0 0 24 24"
-              width="14"
-              height="14"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M9 18h6"></path>
-              <path d="M10 21h4"></path>
-              <path d="M12 2a7 7 0 0 0-4 12.8V17h8v-2.2A7 7 0 0 0 12 2z"></path>
-            </svg>
-          </button>
+              <svg
+                x-show="theme === 'light'"
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="currentColor"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 18h6"></path>
+                <path d="M10 21h4"></path>
+                <path d="M12 2a7 7 0 0 0-4 12.8V17h8v-2.2A7 7 0 0 0 12 2z"></path>
+              </svg>
+              <svg
+                x-show="theme === 'dark'"
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 18h6"></path>
+                <path d="M10 21h4"></path>
+                <path d="M12 2a7 7 0 0 0-4 12.8V17h8v-2.2A7 7 0 0 0 12 2z"></path>
+              </svg>
+            </button>
+          </div>
         </div>
         <p class="meta-line small">
           <span x-text="profile.name"></span>
@@ -931,21 +956,96 @@
           </form>
         </article>
       </div>
+
+      <div
+        class="modal-backdrop"
+        x-cloak
+        x-show="showDbOpsModal"
+        @click.self="closeDbOpsModal()"
+      >
+        <article class="panel modal-card">
+          <h2>DB Backup/Restore</h2>
+          <p class="small muted ops-note">
+            Create an immediate PostgreSQL backup or restore one of the latest
+            <span x-text="dbOps.restoreLimit"></span>
+            saved backups. Only
+            <span x-text="dbOps.restoreLimit"></span>
+            backups are kept. If a new backup would exceed that limit, older backup files are deleted. Backups older than
+            <span x-text="dbOps.retentionDays"></span>
+            days are pruned after each successful backup.
+          </p>
+          <p class="small muted ops-note">
+            After restoring a backup, restart the personal-dashboard so the restored database is picked up.
+          </p>
+          <form class="stack" @submit.prevent="createDatabaseBackup()">
+            <input
+              x-model="dbOpsSecret"
+              type="password"
+              placeholder="Admin secret"
+              autocomplete="current-password"
+              required
+            />
+            <select x-model="selectedBackupFilename" :disabled="dbOpsBusy || !dbOps.backups.length">
+              <option value="">Select backup to restore</option>
+              <template x-for="backup in dbOps.backups" :key="backup.filename">
+                <option :value="backup.filename" x-text="backup.restoreName"></option>
+              </template>
+            </select>
+            <p class="small muted ops-note" x-show="!dbOps.backups.length">
+              No backups are currently available to restore.
+            </p>
+            <p class="small ops-status error" x-show="dbOpsError" x-text="dbOpsError"></p>
+            <p class="small ops-status success" x-show="dbOpsMessage" x-text="dbOpsMessage"></p>
+            <div class="ops-actions">
+              <button class="alt" type="submit" :disabled="dbOpsBusy">
+                <span x-text="dbOpsBusy && dbOpsAction === 'backup' ? 'Creating...' : 'Create Backup'"></span>
+              </button>
+              <button
+                class="warn"
+                type="button"
+                :disabled="dbOpsBusy || !selectedBackupFilename"
+                @click="restoreSelectedBackup()"
+              >
+                <span x-text="dbOpsBusy && dbOpsAction === 'restore' ? 'Restoring...' : 'Restore Backup'"></span>
+              </button>
+              <button class="ghost" type="button" @click="closeDbOpsModal()">Close</button>
+            </div>
+          </form>
+        </article>
+      </div>
+
     </main>
+    <div class="restart-lock" x-cloak x-show="appLocked">
+      <article class="panel restart-lock-card">
+        <h2>Restart Required</h2>
+        <p class="small" x-text="restoreLockMessage"></p>
+      </article>
+    </div>
+    </div>
 
     <script is:inline>
       window.dashboardApp = function () {
         const log = (event, meta = {}) => {
           console.info(`[dashboard] ${event}`, meta);
         };
+        const restoreLockStorageKey = 'dashboard-restore-lock';
 
         return {
           inactivityMs: 30 * 1000,
           newsRefreshMs: 5 * 60 * 1000,
           inactivityTimer: null,
           newsTimer: null,
+          appInstanceId: '',
+          appLocked: false,
+          restoreLockMessage: 'Restart the personal-dashboard to resume using the restored database.',
           theme: 'light',
           profile: { name: 'Loading...', title: '', email: '' },
+          dbOps: {
+            enabled: false,
+            retentionDays: 7,
+            restoreLimit: 5,
+            backups: []
+          },
           panels: [],
           activePanelId: null,
           categories: [],
@@ -961,6 +1061,7 @@
           linkErrorMessage: '',
           showCategoryModal: false,
           showLinkModal: false,
+          showDbOpsModal: false,
           newCategory: '',
           timeDisplay: '',
           todayDisplay: '',
@@ -968,6 +1069,12 @@
           clocksIntervalId: null,
           jokeText: 'Loading a joke...',
           jokeLoaded: false,
+          dbOpsSecret: '',
+          selectedBackupFilename: '',
+          dbOpsBusy: false,
+          dbOpsAction: '',
+          dbOpsError: '',
+          dbOpsMessage: '',
           editingId: null,
           form: {
             name: '',
@@ -997,7 +1104,37 @@
             this.setupNewsAutoRefresh();
           },
 
+          syncRestoreLock() {
+            try {
+              const lockedInstanceId = localStorage.getItem(restoreLockStorageKey) || '';
+              if (lockedInstanceId && lockedInstanceId === this.appInstanceId) {
+                this.appLocked = true;
+                this.restoreLockMessage = 'Database restore completed. Restart the personal-dashboard to ensure the restored database is picked up.';
+                return;
+              }
+              if (lockedInstanceId && lockedInstanceId !== this.appInstanceId) {
+                localStorage.removeItem(restoreLockStorageKey);
+              }
+            } catch {}
+
+            this.appLocked = false;
+            this.restoreLockMessage = 'Restart the personal-dashboard to resume using the restored database.';
+          },
+
+          lockDashboardUntilRestart() {
+            if (!this.appInstanceId) return;
+
+            try {
+              localStorage.setItem(restoreLockStorageKey, this.appInstanceId);
+            } catch {}
+
+            this.appLocked = true;
+            this.restoreLockMessage = 'Database restore completed. Restart the personal-dashboard to ensure the restored database is picked up.';
+            this.showDbOpsModal = false;
+          },
+
           toggleTheme() {
+            if (this.appLocked) return;
             this.theme = this.theme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', this.theme);
             try {
@@ -1025,6 +1162,24 @@
             this.showLinkModal = false;
             this.linkErrorMessage = '';
             this.resetForm();
+          },
+
+          openDbOpsModal() {
+            this.dbOpsError = '';
+            this.dbOpsMessage = '';
+            if (!this.selectedBackupFilename && this.dbOps.backups.length) {
+              this.selectedBackupFilename = this.dbOps.backups[0].filename;
+            }
+            this.showDbOpsModal = true;
+          },
+
+          closeDbOpsModal() {
+            this.showDbOpsModal = false;
+            this.dbOpsSecret = '';
+            this.dbOpsBusy = false;
+            this.dbOpsAction = '';
+            this.dbOpsError = '';
+            this.dbOpsMessage = '';
           },
 
           setupInactivityWatcher() {
@@ -1139,6 +1294,24 @@
             }
             const data = await response.json();
             this.profile = data.profile;
+            this.appInstanceId = String(data.appInstanceId || '');
+            const nextDbOps = data.dbOps || {};
+            this.dbOps = {
+              enabled: Boolean(nextDbOps.enabled),
+              retentionDays: Number.isInteger(nextDbOps.retentionDays) ? nextDbOps.retentionDays : 7,
+              restoreLimit: Number.isInteger(nextDbOps.restoreLimit) ? nextDbOps.restoreLimit : 5,
+              backups: Array.isArray(nextDbOps.backups) ? nextDbOps.backups : []
+            };
+            if (this.selectedBackupFilename) {
+              const selectedStillExists = this.dbOps.backups.some(
+                (backup) => backup.filename === this.selectedBackupFilename
+              );
+              if (!selectedStillExists) {
+                this.selectedBackupFilename = this.dbOps.backups[0]?.filename || '';
+              }
+            } else {
+              this.selectedBackupFilename = this.dbOps.backups[0]?.filename || '';
+            }
             this.panels = data.panels || [];
             this.categories = data.categories;
             if (
@@ -1157,7 +1330,86 @@
               this.form.categoryId = '';
             }
             this.errorMessage = '';
+            this.syncRestoreLock();
             log('load:done', { categories: this.categories.length });
+          },
+
+          async performDbOperation(path, action, body = null) {
+            const secret = this.dbOpsSecret.trim();
+            if (!secret) {
+              this.dbOpsError = 'Admin secret is required';
+              this.dbOpsMessage = '';
+              return null;
+            }
+
+            this.dbOpsBusy = true;
+            this.dbOpsAction = action;
+            this.dbOpsError = '';
+            this.dbOpsMessage = '';
+
+            try {
+              const headers = {
+                'x-db-ops-secret': secret
+              };
+              const requestInit = {
+                method: 'POST',
+                headers
+              };
+              if (body) {
+                headers['Content-Type'] = 'application/json';
+                requestInit.body = JSON.stringify(body);
+              }
+
+              const response = await fetch(path, {
+                ...requestInit
+              });
+              const payload = await response.json().catch(() => ({}));
+
+              if (!response.ok) {
+                throw new Error(payload.error || `Failed to ${action} database`);
+              }
+
+              this.dbOpsMessage = payload.message || `Database ${action} completed`;
+              return payload;
+            } catch (error) {
+              this.dbOpsError = error.message || `Failed to ${action} database`;
+              return null;
+            } finally {
+              this.dbOpsBusy = false;
+              this.dbOpsAction = '';
+            }
+          },
+
+          async createDatabaseBackup() {
+            const payload = await this.performDbOperation('/api/admin/db/backup', 'backup');
+            if (!payload) return;
+            await this.load();
+            this.dbOpsMessage = payload.message || this.dbOpsMessage;
+          },
+
+          async restoreSelectedBackup() {
+            if (!this.selectedBackupFilename) {
+              this.dbOpsError = 'Select a backup to restore';
+              this.dbOpsMessage = '';
+              return;
+            }
+
+            const selectedBackup = this.dbOps.backups.find(
+              (backup) => backup.filename === this.selectedBackupFilename
+            );
+            const restoreName = selectedBackup?.restoreName || this.selectedBackupFilename;
+
+            if (!window.confirm(`Restore backup ${restoreName}? This will overwrite the current database contents.`)) {
+              return;
+            }
+
+            const payload = await this.performDbOperation('/api/admin/db/restore', 'restore', {
+              filename: this.selectedBackupFilename
+            });
+            if (!payload) return;
+            await this.load();
+            this.dbOpsMessage = `${payload.message || `Database restored from ${restoreName}`}. Restart the personal-dashboard to ensure the restored database is picked up.`;
+            this.lockDashboardUntilRestart();
           },
 
           async loadNews() {
