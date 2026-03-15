@@ -10,7 +10,7 @@
 - [Local Development](#local-development)
 - [TODO](#todo)
 - [Development Attribution](#development-attribution)
-- [Environment Variables](#environment-variables)
+- [Special Notes](#special-notes)
 
 ## Description
 A personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized with Docker Compose.
@@ -20,60 +20,19 @@ A personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized wi
 [Back to top](#top)
 
 ## Main Features
-- Personal profile header with:
-  - `Name | Title | Email | Time TZ | Day, Month Date, Year | Categories Count | Links Count`
-  - Chuck Norris joke line under the header
-  - `+ Category` and `+ Link` modal-trigger buttons
-  - `DB Backup/Restore` control beside the theme toggle
-- Dynamic panel system (tabs):
-  - Panels are derived from categories (category lifecycle drives panel lifecycle)
-  - Panel switcher with keyboard shortcuts (`1` to `9`)
-  - Panel drag-and-drop supports both directions (before/after behavior)
-- Category and link management:
-  - Category create modal with inline duplicate-error messaging
-  - Category delete blocked until all links in that category are deleted
-  - Link create/edit modal with inline error messaging
-  - Link description is optional
-  - Duplicate link names are blocked globally across all categories
-- Drag-and-drop with DB persistence:
-  - Reorder panels, categories, and links
-  - Drop links before/after other links
-  - Move links across categories and across panels (drop on panel tabs)
-- Search:
-  - Link-name search from the top bar
-  - Search scans links across categories
-- Link visuals:
-  - Auto-fetched favicon for each link
-  - Fallback icon if site favicon is unavailable
-- News pane:
-  - Dedicated Google News Global pane (headline links + images)
-  - Auto-refreshes independently (no full-page reload)
-- World clocks:
-  - Right-side analog clocks with live hands and digital `hh:mm:ss`
-  - Cities: New York, Berlin, Chennai, Japan
-- Theme and UX behavior:
-  - Light/Dark theme toggle (bulb icon)
-  - Theme persisted in `localStorage`
-  - First-visit system-theme fallback
-  - Theme applied pre-paint to avoid flash
-  - Shared button theme rules so new buttons inherit light/dark styling automatically
-  - Inactivity-based page reload timer
-- Diagnostics and operations:
-  - API/server logging for key operations
-  - Dockerized runtime with PostgreSQL persistence
-  - Secret-protected manual database backup and restore from the dashboard
-  - Restore picker limited to the five newest backups
-  - Automatic deletion of older backup files when a new backup exceeds the five-backup cap
-  - Post-restore restart-required lockout that greys out the dashboard until the app is restarted
+- Frontend: renders the personal dashboard UI with profile metadata, panel/category/link views, search, news, clocks, theme toggle, and backup/restore controls.
+- Frontend interactions: supports category/link CRUD, drag-and-drop ordering, keyboard panel switching, favicon loading, persisted theme state, and inactivity refresh.
+- Backend: serves Astro pages and JSON APIs for dashboard data, CRUD/reorder actions, news fetching, and database operations.
+- Backend persistence and ops: stores panels/categories/links in PostgreSQL, enforces validation/order rules, creates manual backups, keeps only the latest 5 backup files, and restores a selected backup with a restart-required state.
 
 [Back to top](#top)
 
 ## Tech Stack
-- Frontend: <a href="//ahastack.dev" target="_blank">Astro + Alpine.js</a>
-- Data: <a href="https://hub.docker.com/_/postgres" target="_blank">PostgreSQL</a>
-- Runtime/Deployment: <a href="https://docs.docker.com/engine/install/ubuntu" target="_blank">Docker + Docker Compose</a>
+- Frontend: Astro + Alpine.js
+- Database: PostgreSQL 17
+- Runtime/Deployment: Docker, Docker Compose
 - HostOS / Virtualization: Windows 11 / Hyper-V
-- Linux Emulation: <a href="https://learn.microsoft.com/en-us/windows/wsl/install" target="_blank">WSL Ubuntu</a>
+- Linux Emulation: WSL Ubuntu
 
 [Back to top](#top)
 
@@ -105,7 +64,7 @@ flowchart LR
    ```bash
    cp .env.example .env
    ```
-2. Create the volumes and update your `.env` file accordingy:
+2. Create the volume directories and update your `.env` file accordingy:
    ```bash
    mkdir <db-vol-dir>; chown 70:70 <db-vol-dir>; chmod 700 <db-vol-dir>
    mkdir <dbbackup-vol-dir>
@@ -149,17 +108,6 @@ npm run dev
 - Principal developer: Codex (GPT-5 coding agent). _// old N00b 👴 assisted a bit_
 - Collaboration model: iterative prompt-driven development in the local repo with incremental implementation, debugging, and UX refinement.
 
-### Prompt Summary (2026-03-10)
-- Add README back-to-top anchors without changing existing TOC anchors or contents.
-- Implement manual PostgreSQL backup and restore from the dashboard, protected by an admin secret.
-- Rename `.env_example` to `.env.example`, move the app source/build files under `docker/`, and update Docker Compose/build references.
-- Verify backup/restore live in Docker, then fix PostgreSQL client/server version mismatch in the app image.
-- Rename `DB Ops` to `DB Backup/Restore`, move the control beside the theme toggle, and switch restore from latest-only to selecting one of the five newest backups.
-- Format restore names from backup timestamps, enforce a hard 5-backup retention cap, and delete older backups when new ones exceed that cap.
-- Unify button theming so dark mode uses white button text and light mode uses green buttons with white text via shared theme variables.
-- After restore, require a personal-dashboard restart, gray out the UI, block clicks, and keep the dashboard locked until the app restarts.
-- Repeatedly rebuild, restart, and verify the app/database stack with `docker compose`.
-
 ### Prompt Summary (Consolidated)
 - Build a personal link dashboard with Astro + Alpine + PostgreSQL, Dockerfile, and Docker Compose.
 - Variabilize `DATABASE_URL`; fix Astro connection reset and browser runtime errors.
@@ -176,12 +124,19 @@ npm run dev
   - block duplicate link names globally
   - block category deletion until all links in that category are removed
 - Continue iterative UI polish based on prompt feedback (buttons/icons, pane borders, spacing, shadows, and visibility).
+- Add README back-to-top anchors without changing existing TOC anchors or contents.
+- Implement manual PostgreSQL backup and restore from the dashboard, protected by an admin secret.
+- Rename `.env_example` to `.env.example`, move the app source/build files under `docker/`, and update Docker Compose/build references.
+- Verify backup/restore live in Docker, then fix PostgreSQL client/server version mismatch in the app image.
+- Rename `DB Ops` to `DB Backup/Restore`, move the control beside the theme toggle, and switch restore from latest-only to selecting one of the five newest backups.
+- Format restore names from backup timestamps, enforce a hard 5-backup retention cap, and delete older backups when new ones exceed that cap.
+- Unify button theming so dark mode uses white button text and light mode uses green buttons with white text via shared theme variables.
+- After restore, require a personal-dashboard restart, gray out the UI, block clicks, and keep the dashboard locked until the app restarts.
+- Repeatedly rebuild, restart, and verify the app/database stack with `docker compose`.
 
 [Back to top](#top)
 
-## Environment Variables
-See `.env.example` for all available variables.
-
+## Special Notes
 Manual database operations are controlled by:
 
 - `DB_OPS_ENABLED`: enable the in-app backup/restore controls.
