@@ -17,6 +17,8 @@ A personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized wi
 
 ![Light-Mode Dashboard](images/dashboard_lightmode_screenshot.png)
 
+[Back to top](#top)
+
 ## Main Features
 - Personal profile header with:
   - `Name | Title | Email | Time TZ | Day, Month Date, Year | Categories Count | Links Count`
