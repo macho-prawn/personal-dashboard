@@ -1,11 +1,7 @@
 <a id="top"></a>
 
-# Personal Dashboard
-A personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized with Docker Compose.
-
-![Light-Mode Dashboard](images/dashboard_lightmode_screenshot.png)
-
-## Table of Contents
+# Table of Contents
+- [Description](#description)
 - [Main Features](#main-features)
 - [Tech Stack](#tech-stack)
 - [Data Model (Current)](#data-model-current)
@@ -15,6 +11,11 @@ A personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized wi
 - [TODO](#todo)
 - [Development Attribution](#development-attribution)
 - [Environment Variables](#environment-variables)
+
+## Description
+A personal dashboard built with Astro + Alpine.js + PostgreSQL, containerized with Docker Compose.
+
+![Light-Mode Dashboard](images/dashboard_lightmode_screenshot.png)
 
 ## Main Features
 - Personal profile header with:
@@ -101,6 +102,15 @@ flowchart LR
 1. Copy env file:
    ```bash
    cp .env.example .env
+   ```
+2. Create the volumes and update your `.env` file accordingy:
+   ```bash
+   mkdir <db-vol-dir>; chown 70:70 <db-vol-dir>; chmod 700 <db-vol-dir>
+   mkdir <dbbackup-vol-dir>
+   cat >> .env << EOF
+   DB_VOLUME=${pwd}/<db-vol-dir>
+   DB_BACKUP_VOLUME=${pwd}/<dbbackup-vol-dir>
+   EOF 
    ```
 2. Start the stack from the repo root:
    ```bash
